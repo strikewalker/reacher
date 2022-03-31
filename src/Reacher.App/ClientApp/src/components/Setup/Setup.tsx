@@ -14,6 +14,7 @@ import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig } from './s
 
 
 const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f) > -1);
+const reacherSuffix = `@${(isTest ? "test." : "")}reacher.me`;
 const userColor = "#fdaa26";
 
 const Setup: React.FC = () => {
@@ -32,7 +33,7 @@ const Setup: React.FC = () => {
             setError(false);
             await updateSetupConfig(setupConfig);
             setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
+            setTimeout(() => setSaved(false), 8000);
         }
         catch (e) {
             console.error(e);
@@ -92,12 +93,26 @@ const Setup: React.FC = () => {
                             Not you? <Link color={userColor} href="/account/logout">Click Here</Link> to log out.
                         </Text>
                         <Text mb={8}>
-                            Provide the details below, and hit 'Submit' to save your changes
+                            To set up your Reacher email address, provide the details below, and hit 'Submit' to save your changes.
                         </Text>
                         <form onSubmit={handleSubmit}>
                             <VStack
                                 spacing={4}
                             >
+                                <FormControl>
+                                    <FormLabel>Reacher Email</FormLabel>
+                                    <InputGroup>
+                                        <Input
+                                            name="reacheremail"
+                                            placeholder="yourname"
+                                            value={setupConfig!.reacherEmailPrefix}
+                                            onChange={v => setSetupConfig(c => ({ ...c, reacherEmailPrefix: v.target.value }))}
+                                            required
+                                            autoComplete="off"
+                                        />
+                                        <InputRightAddon children={reacherSuffix} />
+                                    </InputGroup>
+                                </FormControl>
                                 <FormControl>
                                     <FormLabel>Display Name</FormLabel>
                                     <Input
@@ -119,20 +134,6 @@ const Setup: React.FC = () => {
                                         required
                                         autoComplete="off"
                                     />
-                                </FormControl>
-                                <FormControl>
-                                    <FormLabel>Reacher Email</FormLabel>
-                                    <InputGroup>
-                                        <Input
-                                            name="reacheremail"
-                                            placeholder="yourname"
-                                            value={setupConfig!.reacherEmailPrefix}
-                                            onChange={v => setSetupConfig(c => ({ ...c, reacherEmailPrefix: v.target.value }))}
-                                            required
-                                            autoComplete="off"
-                                        />
-                                        <InputRightAddon children={`@${(isTest ? "test." : "")}reacher.me`} />
-                                    </InputGroup>
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Destination Email</FormLabel>
@@ -159,9 +160,10 @@ const Setup: React.FC = () => {
                                     An error occurred. Please try again or see console for details.
                                 </Text>}
                                 {saved && <Text color="green">
-                                    Your changes have been saved.
+                                    Success! Emails sent to {setupConfig.reacherEmailPrefix}{reacherSuffix}<br />
+                                    with a tip will be sent to {setupConfig.destinationEmail}.
                                 </Text>}
-                                <Button isLoading={isLoading} type="submit">
+                                <Button isLoading={isLoading} type="submit" width="100%">
                                     Submit
                                 </Button>
                             </VStack>

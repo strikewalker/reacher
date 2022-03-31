@@ -26,7 +26,7 @@ const Home: React.FC = () => {
         <Grid minH="100vh" p={3}>
             <Box>
                 <VStack spacing={4}>
-                    <Center style={{ textAlign: "center" }} pt={4} pb={ 6}>
+                    <Center style={{ textAlign: "center" }} pt={4} pb={6}>
                         <VStack spacing={6}>
                             <Box pb={4}>
                                 <Link href="/">
@@ -64,17 +64,17 @@ const Home: React.FC = () => {
                             <Text width="100%">
                                 <b>Step 6.</b><br /> You respond from your email address through <i>Reacher</i>, and the recipient never sees your actual email address.
                             </Text>
-                            <Link href="/setup" pt={ 4}>
+                            <Link href="/setup" pt={4}>
                                 <Button>
-                                    Log In to Strike and Set Up Your Reacher Email
+                                    Log In with Strike to Set Up Your Reacher Email
                                 </Button>
                             </Link>
                         </VStack>
                     </Box>
-                    <Text pt={8}>
+                    <Text pt={6}>
                         New to <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin?{" "}
                         <Link
-                            href="https://strike.me/download"
+                            href="https://invite.strike.me/5AL8KE"
                             isExternal
                             color={userColor}
                         >
@@ -82,6 +82,20 @@ const Home: React.FC = () => {
                         </Link>{" "}
                         to download Strike and get started.
                     </Text>
+                    <Center pb={6}>
+                        <Link mr={2}
+                            href="https://strike.me/en/legal/privacy"
+                            isExternal
+                        >
+                            Privacy Notice
+                        </Link>{"  |  "}
+                        <Link ml={2}
+                            href="https://strike.me/en/legal/tos"
+                            isExternal
+                        >
+                            Terms of Service
+                        </Link>
+                    </Center>
                 </VStack>
             </Box>
         </Grid>
