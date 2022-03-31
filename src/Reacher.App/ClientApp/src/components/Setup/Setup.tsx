@@ -5,6 +5,7 @@
     InputRightAddon, Link,
     NumberInput,
     NumberInputField,
+    Spinner,
     Stack, Text, VStack
 } from "@chakra-ui/react";
 import * as React from 'react';
@@ -12,9 +13,11 @@ import logo from '../../images/logo_light.svg';
 import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig } from './setupRepo';
 
 
-const isTest = !!["localhost", "test"].filter(f => window.location.host.indexOf(f) > -1);
+const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f) > -1);
+const userColor = "#fdaa26";
 
 const Setup: React.FC = () => {
+    let [saved, setSaved] = React.useState<boolean>();
     let [isLoading, setLoading] = React.useState<boolean>();
     let [error, setError] = React.useState<boolean>();
     let [user, setUser] = React.useState<LoggedInUser>();
@@ -28,6 +31,8 @@ const Setup: React.FC = () => {
             setLoading(true);
             setError(false);
             await updateSetupConfig(setupConfig);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
         }
         catch (e) {
             console.error(e);
@@ -61,10 +66,10 @@ const Setup: React.FC = () => {
                 An error occurred. Please try again or see console for details.
             </Text>;
         }
-        return null;
+        return <Center><Spinner size="xl" /></Center>;
     }
     return (<>
-        <Grid minH="100vh" p={3}>
+        <Grid minH="100vh" p={3} pt={6}>
             <Box maxW="l">
                 <VStack spacing={4}>
                     <Center style={{ textAlign: "center" }}>
@@ -76,18 +81,18 @@ const Setup: React.FC = () => {
                             </Box>
                         </VStack>
                     </Center>
-                    <Box maxW={500}>
+                    <Box maxW={600}>
                         <Center><Heading as="h1" size="xl" mb={8} mt={8}>
                             Set Up Your Reacher Email
                         </Heading></Center>
                         <Text mb={4}>
-                            Provide the details below, and hit 'Submit' to save your changes
-                        </Text>
-                        <Text mb={4}>
                             You are logged in as Strike user, <b>{user.name}</b> ({user.strikeUsername}). <br />
                         </Text>
-                        <Text mb={4}>
-                            Not you? <Link href="/account/logout">Click Here</Link> to log out.
+                        <Text mb={8}>
+                            Not you? <Link color={userColor} href="/account/logout">Click Here</Link> to log out.
+                        </Text>
+                        <Text mb={8}>
+                            Provide the details below, and hit 'Submit' to save your changes
                         </Text>
                         <form onSubmit={handleSubmit}>
                             <VStack
@@ -145,13 +150,16 @@ const Setup: React.FC = () => {
                                     <FormLabel>Tip Amount to Reach(USD)</FormLabel>
                                     <InputGroup>
                                         <InputLeftAddon children={`$`} />
-                                        <NumberInput width="100%" value={setupConfig!.price} isRequired onChange={(_, v) => setSetupConfig(c => ({ ...c, price: v }))} precision={2} step={0.2}>
+                                        <NumberInput width="100%" defaultValue={setupConfig!.price} isRequired onChange={(_, v) => setSetupConfig(c => ({ ...c, price: v }))} min={0.01} precision={2}>
                                             <NumberInputField placeholder="2.00" type="number" />
                                         </NumberInput>
                                     </InputGroup>
                                 </FormControl>
-                                {error && <Text mb={16} color="red">
+                                {error && <Text color="red">
                                     An error occurred. Please try again or see console for details.
+                                </Text>}
+                                {saved && <Text color="green">
+                                    Your changes have been saved.
                                 </Text>}
                                 <Button isLoading={isLoading} type="submit">
                                     Submit

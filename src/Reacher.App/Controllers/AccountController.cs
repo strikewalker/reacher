@@ -25,7 +25,7 @@ public class AccountController : Controller
         return Redirect("/setup");
     }
 
-    [HttpPost]
+    [HttpGet]
     public IActionResult Logout()
     {
         if (HttpContext.User.Identity?.IsAuthenticated == true)

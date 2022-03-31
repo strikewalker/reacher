@@ -24,24 +24,24 @@ const userColor = "#fdaa26";
 const Home: React.FC = () => {
     return (<>
         <Grid minH="100vh" p={3}>
-            <Box maxW="m">
+            <Box>
                 <VStack spacing={4}>
-                    <Center style={{ textAlign: "center" }}>
-                        <VStack spacing={4}>
-                            <Box>
+                    <Center style={{ textAlign: "center" }} pt={4} pb={ 6}>
+                        <VStack spacing={6}>
+                            <Box pb={4}>
                                 <Link href="/">
                                     <Image src={logo} height="140px" display="inline" />
                                 </Link>
                             </Box>
-                            <Heading as="h1" size="2xl" mb={4}>
-                                The Best Way to Get Reached
+                            <Heading as="h1" size="2xl">
+                                Get Paid to Get Reached
                             </Heading>
-                            <Heading as="h2">
-                                and reduce SPAM
-                            </Heading>
+                            <Text fontSize="1.5em">
+                                Reach someone important
+                            </Text>
                         </VStack>
                     </Center>
-                    <Box border="2px solid white" borderRadius={20} padding={10}>
+                    <Box border="2px solid white" borderRadius={20} padding={10} maxW="800px">
                         <VStack spacing={4} style={{ alignContent: "flex-start", width: "100%" }}>
                             <Heading as="h4">
                                 How it works
@@ -64,14 +64,14 @@ const Home: React.FC = () => {
                             <Text width="100%">
                                 <b>Step 6.</b><br /> You respond from your email address through <i>Reacher</i>, and the recipient never sees your actual email address.
                             </Text>
-                            <Link href="/setup">
+                            <Link href="/setup" pt={ 4}>
                                 <Button>
                                     Log In to Strike and Set Up Your Reacher Email
                                 </Button>
                             </Link>
                         </VStack>
                     </Box>
-                    <Text>
+                    <Text pt={8}>
                         New to <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin?{" "}
                         <Link
                             href="https://strike.me/download"
