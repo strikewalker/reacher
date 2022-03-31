@@ -1,0 +1,152 @@
+import { useState, useEffect, useCallback } from "react";
+import QRCode from "./QRCode";
+import * as copy from "copy-to-clipboard";
+import { ToastContainer, toast } from 'react-toastify';
+import { Heading, Text, Link, Box, Flex, Code } from "@chakra-ui/react";
+import { useParams } from "react-router-dom";
+import * as React from 'react'
+import { createLnInvoice, fetchInvoice, fetchInvoiceIsPaid, Invoice, LightningInvoice } from './invoiceRepo'
+import { formatCurrency } from "./utils";
+
+
+const InvoiceComponent: React.FC = () => {
+    let { id } = useParams<{ id: string }>();
+    const [error, setError] = useState<boolean>();
+    const [invoice, setInvoice] = useState<Invoice>();
+    const [lnInvoice, setLnInvoice] = useState<LightningInvoice>();
+    const [isPaid, setIsPaid] = useState<boolean>();
+    useEffect(() => {
+        getInvoice();
+    }, [])
+    useEffect(() => {
+        if (!invoice) {
+            return;
+        }
+        refreshLnInvoice();
+    }, [invoice]);
+    useEffect(() => {
+        if (!lnInvoice) {
+            return;
+        }
+        checkInvoiceStatus();
+    }, [lnInvoice]);
+
+
+    const checkInvoiceStatus = async () => {
+        try {
+            const result = await fetchInvoiceIsPaid(invoice!.strikeInvoiceId);
+            if (result.paid) {
+                setIsPaid(true);
+                return;
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+        setTimeout(checkInvoiceStatus, 2000);
+    }
+    const getInvoice = async () => {
+        const result = await fetchInvoice(id);
+        if (result.paid) {
+            setIsPaid(true);
+            return;
+        }
+        setInvoice(result);
+    }
+    const refreshLnInvoice = async () => {
+        if (isPaid) {
+            return;
+        }
+        const result = await createLnInvoice(invoice!.strikeInvoiceId);
+        setLnInvoice(result);
+        setTimeout(refreshLnInvoice, (result.expirationInSeconds - 15) * 1000)
+    }
+
+    const copyLnInvoiceToClipboard = () => {
+        (copy as any)(lnInvoice!.lnInvoiceId);
+        toast("Copied ⚡️ invoice to clipboard");
+    };
+
+    let inner: React.ReactNode = null;
+    if (error) {
+        inner = <Heading as="h1" size="3xl" mb={4}>
+            Error occured. Please try again later.
+        </Heading>
+    }
+    else if (isPaid) {
+        inner = <Heading as="h1" size="3xl" mb={4}>
+            Thank you. Your email has been sent.
+        </Heading>
+    }
+    else if (!invoice) {
+        inner = <Heading as="h1" size="3xl" mb={4}>
+            Loading details. Please wait...
+        </Heading>
+    }
+    else if (!lnInvoice) {
+        inner = <Heading as="h1" size="3xl" mb={4}>
+            Loading your ⚡️ invoice. Please wait...
+        </Heading>
+    }
+    else {
+        const displayAmount = formatCurrency({
+            amount: invoice.costUsd,
+            currency: "USD",
+            locales: window.navigator.language,
+        });
+        inner = <>
+            <Heading as="h1" size="3xl" mb={4}>
+                Reach <b>{invoice.reachable.name}</b> by paying the invoice below.
+            </Heading>
+            <Text>
+                The cost to finish sending your message is <Code>{displayAmount}</Code>
+            </Text>
+            <Flex direction="column" justifyContent="space-between" height={400}>
+                <QRCode
+                    data={lnInvoice.lnInvoiceId}
+                    animationDuration={lnInvoice.expirationInSeconds}
+                />
+                <Box>
+                    <Text>
+                        Alternatively, to copy the Bitcoin Lighting invoice,{" "}
+                        <Link
+                            role="button"
+                            href="#"
+                            onClick={copyLnInvoiceToClipboard}
+                            variant="brand"
+                        >
+                            click here.
+                        </Link>
+                    </Text>
+                    <Text>
+                        To pay from a Bitcoin wallet,{" "}
+                        <Link href={`lightning:${lnInvoice.lnInvoiceId}`} variant="brand">
+                            click here.
+                        </Link>
+                    </Text>
+                </Box>
+                <Text>
+                    New to Bitcoin?{" "}
+                    <Link
+                        href="https://strike.me/download"
+                        isExternal
+                        variant="brand"
+                    >
+                        Click here
+                    </Link>{" "}
+                    to download Strike and get started.
+                </Text>
+            </Flex>
+        </>
+    }
+
+    return (
+        <>
+            <Box maxW={594}>
+                {inner}
+            </Box>
+            <ToastContainer />
+        </>
+    );
+}
+export default InvoiceComponent;
