@@ -1,7 +1,7 @@
 
 export async function getSetupModel() {
-    const response = await fetch(`/api/setup`);
-    if (response.redirected) {
+    const response = await fetch(`/api/setup`, { redirect: 'manual' });
+    if (!response.status || response.status === 302) {
         return null;
     }
     return response.json() as Promise<SetupModel>;
