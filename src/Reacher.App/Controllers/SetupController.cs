@@ -64,7 +64,7 @@ public class SetupController : ControllerBase
                 await _db.SaveChangesAsync();
             }
         }
-        var toReplace = _settings.IsTest == true ? "@test.reacher.me" : "@reacher.me";
+        var toReplace = _settings.IsTest == true ? "@testing.reacher.me" : "@reacher.me";
         var setupModel = new SetupModel
         {
             User = new() { Name = user.Name, StrikeUsername = user.StrikeUsername },
@@ -95,7 +95,7 @@ public class SetupController : ControllerBase
         reachable.Name = config.Name;
         reachable.Description = config.Name;
         reachable.StrikeUsername = config.StrikeUsername;
-        reachable.ReacherEmailAddress = $"{config.ReacherEmailPrefix}@{(_settings.IsTest ? "test.": "")}reacher.me";
+        reachable.ReacherEmailAddress = $"{config.ReacherEmailPrefix}@{(_settings.IsTest ? "testing.": "")}reacher.me";
         reachable.ToEmailAddress = config.DestinationEmail;
         reachable.CostUsdToReach = config.Price;
         await _db.SaveChangesAsync();

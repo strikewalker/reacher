@@ -1,4 +1,4 @@
-import { Box, Button, Center, Grid, Image, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Center, Grid, Image, Link, Text, VStack } from "@chakra-ui/react";
 import * as React from "react";
 import { FC, ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import bitcoin from '../bitcoin.svg';
 import { createLnInvoice, fetchInvoice, fetchInvoiceIsPaid, Invoice, LightningInvoice } from './invoiceRepo';
 import QRCode from "./QR";
 import { formatCurrency } from "./utils";
+import Button from '../Button';
 
 const userColor = "#fdaa26";
 
@@ -104,19 +105,20 @@ const InvoiceComponent: FC = () => {
         });
 
         inner =
-            <Box maxW="m">
+            <Box>
                 <VStack spacing={4}>
                     <Box>
                         <Link href="/"><Image src={logo} height="100px" display="inline" /></Link>
                     </Box>
-                    <Text fontSize="5xl" mb={4} fontWeight="600" pt={4} pb={4}>
-                        Reach <ReacherName />
+
+                    <Text fontSize="xl" style={{ textAlign: "center" }}>
+                        Tip <ReacherName /> <b>{displayAmount}</b>
                     </Text>
                     <Text style={{ textAlign: "center" }}>
-                        Send <ReacherName /> a tip for <b>{displayAmount}</b>, then Reacher will deliver your email.
+                        then Reacher will deliver your email
                     </Text>
-                    <Text fontSize='sm' color="rgba(255,255,255,0.7)">Just <b>click</b> on the QR code below or copy and paste it into your favorite <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin lightning wallet</Text>
-                    <Box mt={[3, 0]} pt={4}>
+                <Text fontSize='sm' pt={2} color="rgba(255,255,255,0.6)">Just <b>scan</b> or <b>click</b> the QR code below</Text>
+                    <Box mt={[3, 0]}>
                         <a href={`lightning:${lnInvoice.lnInvoiceId}`}>
                             {lnInvoice.expirationInSeconds && (
                                 <QRCode key={lnInvoice.lnInvoiceId}
@@ -128,20 +130,10 @@ const InvoiceComponent: FC = () => {
                             )}
                         </a>
                     </Box>
-                    <Box pt={4}>
+                    <Text fontSize='sm' color="rgba(255,255,255,0.6)"> or paste it in your <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin lightning wallet</Text>
+                    <Box>
                         {isExpired ? (
-                            <Button
-                                onClick={refreshLnInvoice}
-                                sx={{
-                                    bg: userColor,
-                                    color: getButtonTextColorFromBg(userColor),
-
-                                    ":hover": {
-                                        bg: userColor,
-                                        opacity: 0.9,
-                                    },
-                                }}
-                            >
+                            <Button onClick={refreshLnInvoice}>
                                 Refresh
                             </Button>
                         ) : (
@@ -151,13 +143,15 @@ const InvoiceComponent: FC = () => {
                                     setCopied(true);
                                     setTimeout(() => setCopied(false), 2000);
                                 }}
-                                variant="outline"
                             >
                                 {copied ? "Copied" : "Copy To Clipboard"}
                             </Button>
                         )}
                     </Box>
-                    <Text pt={4}>
+                    <Text fontSize="sm" pt={4}>
+                        All tips go <b>directly to <ReacherName /></b>
+                    </Text>
+                    <Text fontSize="sm" textAlign="center">
                         New to <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin?{" "}
                         <Link
                             href="https://invite.strike.me/5AL8KE"
@@ -166,12 +160,9 @@ const InvoiceComponent: FC = () => {
                         >
                             Click here
                         </Link>{" "}
-                        to download Strike and get started.
+                        to get started with <b>Strike</b>.
                     </Text>
-                    <Text>
-                        Please note that all tips go <b>directly to <ReacherName /></b>
-                    </Text>
-                    <Center pb={6} pt={4}>
+                    <Center pb={6} pt={4} fontSize="sm">
                         <Link mr={2}
                             href="https://strike.me/en/legal/privacy"
                             isExternal

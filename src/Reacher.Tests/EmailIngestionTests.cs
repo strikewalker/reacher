@@ -161,62 +161,58 @@ pass
         var str = @"--xYzZY
 Content-Disposition: form-data; name=""headers""
 
-Received: by mx0147p1mdw1.sendgrid.net with SMTP id 00diEBuEXt Tue, 22 Feb 2022 04:07:57 +0000 (UTC)
-Received: from mail-pf1-f179.google.com (unknown [209.85.210.179]) by mx0147p1mdw1.sendgrid.net (Postfix) with ESMTPS id B9315120D86 for <walker@reacher.me>; Tue, 22 Feb 2022 04:07:57 +0000 (UTC)
-Received: by mail-pf1-f179.google.com with SMTP id y11so10683533pfa.6 for <walker@reacher.me>; Mon, 21 Feb 2022 20:07:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=strike.me; s=google; h=mime-version:from:date:message-id:subject:to; bh=E+45JlxW5HuN9kQQU35OOXIJdO2ph7i5usVG8sin6d8=; b=cngN1qsYZqew/kxIyhYc6WUP5pP5XTslV9WIhQPM1/4LL5bnG0uIPkwusLMJdOUs1C X8HJSlCs2IKpp8JCnBj2dgetRI7xN45Yn1Bqs7pz3DWQ0L0L9hniI6Jih7nU0oP3yb+W FfWxT8sm58CzKP7Twz0+eQHvgg3mgdrlcrwTf+LuZ2X5hRob4AWKp7oelpfpaTrOsR4Q iUmlff3u0evHZ0rXohcgQNs4tLNpESHEGmp7/O8Xi44mYGssvm2wfje7d92ylJEdOy7u 2rO9W+s7US6UekNhZYYw6BLp9F2Mnz/WSUnnjLZxIHgphD8RGhzryNgDNmENNPtA4MUx 7qKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20210112; h=x-gm-message-state:mime-version:from:date:message-id:subject:to; bh=E+45JlxW5HuN9kQQU35OOXIJdO2ph7i5usVG8sin6d8=; b=C6gT+L54XSnbEhmuX7hKhiIwJLJL7tlcmdG1iCVvuNJt/6mAlusgiP6QtnpDO5H3PW sZFzHJr2t1kZ0LMynKJLGH89D+9SaBehUHaJ2AnQyR7MnXQe+erTdvrUfq4jyaoa6ruh 7ERjvFlGXbOFl5imylYIZ4xXkPGqF/y/rQVMzx+heR+GdJvaFjfy+k1AabraIXQlm84p sjSNSr3ba55DNTVBvlOqV2TQq8479z5xI769lzKiMvyD21KzTY3Y623G3+yRwHKP3WrZ Jhjql9NTfGM9CRZ9cy3s5x6PU/fmPvmvXe9xiCIYshUJko5k7yRv4XRappOtyxUcr7/1 ojIg==
-X-Gm-Message-State: AOAM532dsF6U95XX9HMG8r6zAvUXD5P2JzceZ82IwAg1R4cwvc4ltCdI 37dyHY4SBIOBSyt0SgF9Yu38V2dmtlwIsiPl8ZaE/CU1m+Y=
-X-Google-Smtp-Source: ABdhPJxAF4+K13YHPUEo0SnXHS3z06GL2NDEXMcvJsWzHHJTl6giKBGqEDpCbNCqJcTPvedf9yju3b8hhD3m/MrC1qA=
-X-Received: by 2002:aa7:8b13:0:b0:4f0:f393:ec42 with SMTP id f19-20020aa78b13000000b004f0f393ec42mr16253817pfd.6.1645502877044; Mon, 21 Feb 2022 20:07:57 -0800 (PST)
+Received: by mx0079p1las1.sendgrid.net with SMTP id mBAmCheUPH Fri, 01 Apr 2022 14:37:22 +0000 (UTC)
+Received: from mail-oa1-f43.google.com (unknown [209.85.160.43]) by mx0079p1las1.sendgrid.net (Postfix) with ESMTPS id A217420D8D for <sam@testing.reacher.me>; Fri,  1 Apr 2022 14:37:22 +0000 (UTC)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-df02f7e2c9so2865192fac.10 for <sam@testing.reacher.me>; Fri, 01 Apr 2022 07:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bluesam-com.20210112.gappssmtp.com; s=20210112; h=mime-version:from:date:message-id:subject:to; bh=02EMjoj/RnszSxIk7/8eA11fNNslA6dYdBgrVFsLb0M=; b=MgDs5Y1D/Q1m6HpxuhxZcgf4A5SH6i1XDDggWyY6bZEvOqIZyLWhPXrvC4CuvIQG4b cy1dOTGKgfqcQmlcaFvPLOdvUeN90Dy4sfANMCjgBWuPDHlTI/4HN8Jji1jMLm0LQ+OI o/m8UMreDTrQsQYf5NglBiBB9zMxMcah1VGW96JR3RdQEFUUZ3eILNA5lGaZwJQjkg7c KznYFcK4zxSOtOmPGZQllLxRFbxxRFVOA1Vr/gPc8qIeJoxB8u2M7I75nxIWGkGIkuUB uLkj81MPCepKC8kSB8Aq7od/R7Nx9svYvrxw/2N16DlH36Q4BCZpA/WH/YNe5b0Qgvk1 x8vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20210112; h=x-gm-message-state:mime-version:from:date:message-id:subject:to; bh=02EMjoj/RnszSxIk7/8eA11fNNslA6dYdBgrVFsLb0M=; b=66PyH4omBgBoyI6D3amx5x6HmWpfD5tQJYW2mG+gmoGWeKLhHaaU0870lLk9JUGcJr SQJMLZgMc7SPdBn+GsFXTea6HduPXa9zlQoTiFt1jG/roXIMY18AR6TNWmRpIQRoJ4AK huRV1HW2OiagOj/bNIht8doJYJ9eUs5TO8/sM2EL1hq9kDJ5JCb20mFUUjPlzL6+zgNE iz7sXTURbYkWu9Tla0/B8QsIwt7TnW9M7n+j7OXPSghc614idpVmhNpyee1c7ms0RX7J Kwt+wS5IBM1JOGJm+dgQ9GXB3wLsz+0S0MkBg6bkfGPZSSeI981n7V1aEzMTRNt+PZly i2eQ==
+X-Gm-Message-State: AOAM533JcJctaTLj3R8gZ7rlHXjRxP/+0Ov3CD85xevc4FjsnKJxu5X9 M5imu77Y9rgaeGAtdQ/7YDiun5piL+gh2IKea63VCgbhPiPNUg==
+X-Google-Smtp-Source: ABdhPJzy3fPxLTFJNn/pjznoxyF/+LTgCczerU+MnWizduMYE0+qEd5StQ8pM8r8WTr5QYU/oJp/ihrskQr/jqR0KzI=
+X-Received: by 2002:a05:6870:4790:b0:dd:cd0f:e00b with SMTP id c16-20020a056870479000b000ddcd0fe00bmr5134544oaq.120.1648823841468; Fri, 01 Apr 2022 07:37:21 -0700 (PDT)
 MIME-Version: 1.0
-From: Samuel Walker <bluesam@hotmail.com>
-Date: Mon, 21 Feb 2022 21:07:41 -0700
-Message-ID: <CADPcVZi3TxCfPE6aMmG3YpBkJvN5Y2G9nzrcH6PwfwFNMMk0pw@mail.gmail.com>
-Subject: Hey Man
-To: walker@reacher.me
-Content-Type: multipart/alternative; boundary=""000000000000769ef805d8937ee0""
+From: Sam Walker <sam@bluesam.com>
+Date: Fri, 1 Apr 2022 08:37:09 -0600
+Message-ID: <CAC74HnLNkPamK9A0a6UGnM1HhhHWWnWa8zL3h8+HE_mwnZ=V2Q@mail.gmail.com>
+Subject: A Third Try
+To: sam@testing.reacher.me
+Content-Type: multipart/alternative; boundary=""0000000000005e428205db98b726""
 
 --xYzZY
 Content-Disposition: form-data; name=""dkim""
 
-{@strike.me : pass}
+{@bluesam-com.20210112.gappssmtp.com : pass}
 --xYzZY
 Content-Disposition: form-data; name=""to""
 
-walker@reacher.me
+sam@testing.reacher.me
 --xYzZY
 Content-Disposition: form-data; name=""html""
 
-<div dir=""ltr"">This is just a<div>test <b>email</b></div><div><b><br></b></div><div><b>From </b>Sam</div></div>
+<div dir=""ltr"">Should see in beeceptor</div>
 
 --xYzZY
 Content-Disposition: form-data; name=""from""
 
-Samuel Walker <bluesam@hotmail.com>
+Sam Walker <sam@bluesam.com>
 --xYzZY
 Content-Disposition: form-data; name=""text""
 
-This is just a
-test *email*
-
-*From *Sam
+Should see in beeceptor
 
 --xYzZY
 Content-Disposition: form-data; name=""sender_ip""
 
-209.85.210.179
+209.85.160.43
 --xYzZY
 Content-Disposition: form-data; name=""spam_report""
 
-Spam detection software, running on the system ""mx0147p1mdw1.sendgrid.net"",
+Spam detection software, running on the system ""mx0079p1las1.sendgrid.net"",
 has NOT identified this incoming email as spam.  The original
 message has been attached to this so you can view it or label
 similar future email.  If you have any questions, see
 @@CONTACT_ADDRESS@@ for details.
 
-Content preview:  This is just a test *email* *From *Sam This is just a test
-   email [...] 
+Content preview:  Should see in beeceptor Should see in beeceptor [...] 
 
 Content analysis details:   (0.0 points, 5.0 required)
 
@@ -229,7 +225,7 @@ Content analysis details:   (0.0 points, 5.0 required)
 --xYzZY
 Content-Disposition: form-data; name=""envelope""
 
-{""to"":[""walker@reacher.me""],""from"":""bluesam@hotmail.com""}
+{""to"":[""sam@testing.reacher.me""],""from"":""sam@bluesam.com""}
 --xYzZY
 Content-Disposition: form-data; name=""attachments""
 
@@ -237,7 +233,7 @@ Content-Disposition: form-data; name=""attachments""
 --xYzZY
 Content-Disposition: form-data; name=""subject""
 
-Hey Man
+A Third Try
 --xYzZY
 Content-Disposition: form-data; name=""spam_score""
 
@@ -249,7 +245,7 @@ Content-Disposition: form-data; name=""charsets""
 --xYzZY
 Content-Disposition: form-data; name=""SPF""
 
-neutral
+pass
 --xYzZY--
 ";
         return GenerateStreamFromString(str);

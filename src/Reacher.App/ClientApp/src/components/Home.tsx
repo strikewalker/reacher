@@ -1,36 +1,30 @@
-﻿import * as React from 'react';
-
-import {
-    Heading,
-    Text,
-    FormControl,
-    FormLabel,
-    Link,
-    Stack,
-    Box,
-    Flex,
-    Input,
-    Image,
-    Grid,
-    Center,
-    VStack,
-    Button
+﻿import {
+    Box, Center, Grid, Heading, Image, Link, Text, VStack
 } from "@chakra-ui/react";
-import logo from '../images/logo_light.svg'
-import bitcoin from './bitcoin.svg'
+import * as React from 'react';
+import logo from '../images/logo_light.svg';
+import bitcoin from './bitcoin.svg';
 
-const userColor = "#fdaa26";
+import { orangeColor } from './Common';
+import Button from './Button';
+
+const toSetup =
+    (<Link href="/setup" pt={2} pb={2} textDecoration="none !important">
+        <Button>
+            Log In with Strike to Set Up Your Reacher Email
+        </Button>
+    </Link>);
 
 const Home: React.FC = () => {
     return (<>
         <Grid minH="100vh" p={3}>
             <Box>
-                <VStack spacing={4}>
-                    <Center style={{ textAlign: "center" }} pt={4} pb={6}>
+                <VStack spacing={6}>
+                    <Center style={{ textAlign: "center" }} pt={4}>
                         <VStack spacing={6}>
                             <Box pb={4}>
                                 <Link href="/">
-                                    <Image src={logo} height="140px" display="inline" />
+                                    <Image src={logo} height="100px" display="inline" />
                                 </Link>
                             </Box>
                             <Heading as="h1" size="2xl">
@@ -41,7 +35,8 @@ const Home: React.FC = () => {
                             </Text>
                         </VStack>
                     </Center>
-                    <Box border="2px solid white" borderRadius={20} padding={10} maxW="800px">
+                    {toSetup}
+                    <Box border="2px solid white" borderRadius={20} padding={10}>
                         <VStack spacing={4} style={{ alignContent: "flex-start", width: "100%" }}>
                             <Heading as="h4">
                                 How it works
@@ -64,19 +59,15 @@ const Home: React.FC = () => {
                             <Text width="100%">
                                 <b>Step 6.</b><br /> You respond from your email address through <i>Reacher</i>, and the recipient never sees your actual email address.
                             </Text>
-                            <Link href="/setup" pt={4}>
-                                <Button>
-                                    Log In with Strike to Set Up Your Reacher Email
-                                </Button>
-                            </Link>
                         </VStack>
                     </Box>
+                    {toSetup}
                     <Text pt={6}>
                         New to <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin?{" "}
                         <Link
                             href="https://invite.strike.me/5AL8KE"
                             isExternal
-                            color={userColor}
+                            color={orangeColor}
                         >
                             Click here
                         </Link>{" "}

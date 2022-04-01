@@ -22,7 +22,7 @@ namespace Reacher.Data.External.Strike
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.7.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class StrikeClient : IStrikeClient
     {
-        private string _baseUrl = "https://api.strike.me/";
+        private string _baseUrl = null;
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 

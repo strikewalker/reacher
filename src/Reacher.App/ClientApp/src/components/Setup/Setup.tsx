@@ -1,20 +1,21 @@
 ﻿import {
-    Box, Button, Center, FormControl,
+    Box, Center, FormControl,
     FormLabel, Grid, Heading, Image, Input, InputGroup,
     InputLeftAddon,
-    InputRightAddon, Link,
+    InputRightAddon, Link, 
     NumberInput,
     NumberInputField,
     Spinner,
-    Stack, Text, VStack
+    Text, VStack
 } from "@chakra-ui/react";
 import * as React from 'react';
+import Button from '../Button';
 import logo from '../../images/logo_light.svg';
 import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig } from './setupRepo';
 
 
 const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f) > -1);
-const reacherSuffix = `@${(isTest ? "test." : "")}reacher.me`;
+const reacherSuffix = `@${(isTest ? "testing." : "")}reacher.me`;
 const userColor = "#fdaa26";
 
 const Setup: React.FC = () => {
@@ -71,13 +72,13 @@ const Setup: React.FC = () => {
     }
     return (<>
         <Grid minH="100vh" p={3} pt={6}>
-            <Box maxW="l">
+            <Box>
                 <VStack spacing={4}>
                     <Center style={{ textAlign: "center" }}>
                         <VStack spacing={4}>
                             <Box>
                                 <Link href="/">
-                                    <Image src={logo} height="140px" display="inline" />
+                                    <Image src={logo} height="100px" display="inline" />
                                 </Link>
                             </Box>
                         </VStack>
@@ -151,7 +152,7 @@ const Setup: React.FC = () => {
                                     <FormLabel>Tip Amount to Reach(USD)</FormLabel>
                                     <InputGroup>
                                         <InputLeftAddon children={`$`} />
-                                        <NumberInput width="100%" defaultValue={setupConfig!.price} isRequired onChange={(_, v) => setSetupConfig(c => ({ ...c, price: v }))} min={0.01} precision={2}>
+                                        <NumberInput width="100%" defaultValue={setupConfig!.price} isRequired onChange={(_, v) => setSetupConfig(c => ({ ...c, price: v }))} precision={2}>
                                             <NumberInputField placeholder="2.00" type="number" />
                                         </NumberInput>
                                     </InputGroup>
@@ -159,7 +160,7 @@ const Setup: React.FC = () => {
                                 {error && <Text color="red">
                                     An error occurred. Please try again or see console for details.
                                 </Text>}
-                                {saved && <Text color="green">
+                                {saved && <Text color="green" textAlign="center">
                                     Success! Emails sent to {setupConfig.reacherEmailPrefix}{reacherSuffix}<br />
                                     with a tip will be sent to {setupConfig.destinationEmail}.
                                 </Text>}

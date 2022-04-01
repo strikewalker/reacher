@@ -1,16 +1,20 @@
 import { Button as ChakraButton, ButtonProps } from "@chakra-ui/react";
 import * as React from 'react';
 
-export const Button: React.FC<ButtonProps> = ({
+import { orangeColor } from './Common';
+export const Button: React.FC<ButtonProps & { href?: string }> = ({
     children,
-    onClick = () => { },
+    onClick,
+    href,
     ...rest
 }) => {
+    if (href && !onClick) {
+        onClick = () => { window.location.href = href;}
+    }
     return (
-        <ChakraButton
+        <ChakraButton color="black" bg={orangeColor} _hover={{ opacity:0.6 }}
             onClick={onClick}
             variant="primary"
-            height={14}
             {...rest}
         >
             {children}
@@ -18,4 +22,4 @@ export const Button: React.FC<ButtonProps> = ({
     );
 }
 
-export default Button; 
+export default Button;
