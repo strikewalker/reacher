@@ -18,7 +18,9 @@ const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f)
 const reacherSuffix = `@${(isTest ? "testing." : "")}reacher.me`;
 const userColor = "#fdaa26";
 
+let load = 0;
 const Setup: React.FC = () => {
+    let [saves, setSaves] = React.useState(0);
     let [saved, setSaved] = React.useState<boolean>();
     let [isLoading, setLoading] = React.useState<boolean>();
     let [error, setError] = React.useState<boolean>();
@@ -35,6 +37,7 @@ const Setup: React.FC = () => {
             await updateSetupConfig(setupConfig);
             setSaved(true);
             setTimeout(() => setSaved(false), 8000);
+            setSaves(++saves);
         }
         catch (e) {
             console.error(e);
@@ -44,24 +47,25 @@ const Setup: React.FC = () => {
             setLoading(false);
         }
     }
+    const reloadAccount = async () => {
+        try {
+            var setupModel = await getSetupModel();
+            if (!setupModel) {
+                window.location.href = '/account/login';
+                return;
+            }
+            const { user, config } = setupModel!;
+            setUser(user);
+            setSetupConfigTemp(config);
+        }
+        catch (e: any) {
+            console.error(e);
+            setError(true);
+        }
+    }
     React.useEffect(() => {
-        (async () => {
-            try {
-                var setupModel = await getSetupModel();
-                if (!setupModel) {
-                    window.location.href = '/account/login';
-                    return;
-                }
-                const { user, config } = setupModel!;
-                setUser(user);
-                setSetupConfigTemp(config);
-            }
-            catch (e: any) {
-                console.error(e);
-                setError(true);
-            }
-        })();
-    }, []);
+        reloadAccount();
+    }, [saves]);
     if (!user || !setupConfig) {
         if (error) {
             return <Text mb={16} color="red">
@@ -71,7 +75,7 @@ const Setup: React.FC = () => {
         return <Center><Spinner size="xl" /></Center>;
     }
     return (<>
-        <Grid minH="100vh" p={3} pt={6}>
+        <Grid minH="100vh" p={3} pt={6} key={saves}>
             <Box>
                 <VStack spacing={4}>
                     <Center style={{ textAlign: "center" }}>
@@ -90,7 +94,7 @@ const Setup: React.FC = () => {
                         <Text mb={4}>
                             You are logged in as Strike user, <b>{user.name}</b> ({user.strikeUsername}). <br />
                         </Text>
-                        <Text mb={8}>
+                        <Text mb={8} fontSize="sm">
                             Not you? <Link color={userColor} href="/account/logout">Click Here</Link> to log out.
                         </Text>
                         <Text mb={8}>
@@ -104,7 +108,6 @@ const Setup: React.FC = () => {
                                     <FormLabel>Reacher Email</FormLabel>
                                     <InputGroup>
                                         <Input
-                                            name="reacheremail"
                                             placeholder="yourname"
                                             value={setupConfig!.reacherEmailPrefix}
                                             onChange={v => setSetupConfig(c => ({ ...c, reacherEmailPrefix: v.target.value }))}
@@ -117,7 +120,6 @@ const Setup: React.FC = () => {
                                 <FormControl>
                                     <FormLabel>Display Name</FormLabel>
                                     <Input
-                                        name="displayname"
                                         placeholder="Satoshi Nakamoto"
                                         value={setupConfig!.name}
                                         onChange={v => setSetupConfig(c => ({ ...c, name: v.target.value }))}
@@ -128,10 +130,9 @@ const Setup: React.FC = () => {
                                 <FormControl>
                                     <FormLabel>Strike Username</FormLabel>
                                     <Input
-                                        name="username"
                                         placeholder="satoshi"
                                         value={setupConfig!.strikeUsername}
-                                        onChange={v => setSetupConfig(c => ({ ...c, strikeUser: v.target.value }))}
+                                        onChange={v => setSetupConfig(c => ({ ...c, strikeUsername: v.target.value }))}
                                         required
                                         autoComplete="off"
                                     />
@@ -139,7 +140,6 @@ const Setup: React.FC = () => {
                                 <FormControl>
                                     <FormLabel>Destination Email</FormLabel>
                                     <Input
-                                        name="email"
                                         type="email"
                                         placeholder="user@email.com"
                                         value={setupConfig!.destinationEmail}
@@ -149,12 +149,21 @@ const Setup: React.FC = () => {
                                     />
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Tip Amount to Reach(USD)</FormLabel>
+                                    <FormLabel>Tip Amount to be Reached (USD)</FormLabel>
                                     <InputGroup>
                                         <InputLeftAddon children={`$`} />
-                                        <NumberInput width="100%" defaultValue={setupConfig!.price} isRequired onChange={(_, v) => setSetupConfig(c => ({ ...c, price: v }))} precision={2}>
-                                            <NumberInputField placeholder="2.00" type="number" />
-                                        </NumberInput>
+                                        <Input
+                                            placeholder="2.00"
+                                            defaultValue={setupConfig!.price?.toFixed(2)}
+                                            onChange={v => {
+                                                var value = parseFloat(v.target.value);
+                                                if (value > 0) {
+                                                    setSetupConfig(c => ({ ...c, price: parseFloat(value.toFixed(2)) }))
+                                                }
+                                            }}
+                                            required
+                                            autoComplete="off"
+                                        />
                                     </InputGroup>
                                 </FormControl>
                                 {error && <Text color="red">

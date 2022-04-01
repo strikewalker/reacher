@@ -9,11 +9,10 @@ import { orangeColor } from './Common';
 import Button from './Button';
 
 const toSetup =
-    (<Link href="/setup" pt={2} pb={2} textDecoration="none !important">
-        <Button>
-            Log In with Strike to Set Up Your Reacher Email
-        </Button>
-    </Link>);
+    (<VStack>
+        <Button href="/setup">Log In with Strike</Button>
+        <Text fontSize="sm">to set up <Text as="span" color={orangeColor}>your Reacher email</Text></Text>
+    </VStack>);
 
 const Home: React.FC = () => {
     return (<>
