@@ -6,11 +6,13 @@ public record SetupModel
     public SetupConfig Config { get; set; }
 }
 public record SetupConfig { 
-    public string Name { get; set; }
-    public string StrikeUsername { get; set; }
+    public string? Name { get; set; }
+    public string? StrikeUsername { get; set; }
     public decimal Price { get; set; }
     public string? ReacherEmailPrefix { get; set; }
     public string? DestinationEmail { get; set; }
+    public string? Currency { get; set; }
+    public bool Disabled { get; set; }
 }
 
 public record LoggedInUser { 

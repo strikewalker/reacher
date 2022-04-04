@@ -35,6 +35,8 @@ namespace Reacher.Data.External.Strike.Models
         [Newtonsoft.Json.JsonProperty("isAvailable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public bool IsAvailable { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("isInvoiceable", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool IsInvoiceable { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.7.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]

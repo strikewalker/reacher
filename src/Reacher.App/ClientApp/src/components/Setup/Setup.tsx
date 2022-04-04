@@ -2,16 +2,13 @@
     Box, Center, FormControl,
     FormLabel, Grid, Heading, Image, Input, InputGroup,
     InputLeftAddon,
-    InputRightAddon, Link, 
-    NumberInput,
-    NumberInputField,
-    Spinner,
-    Text, VStack
+    InputRightAddon, Link, Spinner,
+    Text, VStack, Switch, FormHelperText
 } from "@chakra-ui/react";
 import * as React from 'react';
-import Button from '../Button';
 import logo from '../../images/logo_light.svg';
-import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig } from './setupRepo';
+import Button from '../Button';
+import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig, getCurrency, getReacherEmailAvailable } from './setupRepo';
 
 
 const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f) > -1);
@@ -21,7 +18,9 @@ const userColor = "#fdaa26";
 let load = 0;
 const Setup: React.FC = () => {
     let [saves, setSaves] = React.useState(0);
+    let [reacherPrefixInvalid, setReacherPrefixInvalid] = React.useState(false);
     let [saved, setSaved] = React.useState<boolean>();
+    let [usernameInvalid, setUsernameInvalid] = React.useState<boolean>();
     let [isLoading, setLoading] = React.useState<boolean>();
     let [error, setError] = React.useState<boolean>();
     let [user, setUser] = React.useState<LoggedInUser>();
@@ -46,6 +45,21 @@ const Setup: React.FC = () => {
         finally {
             setLoading(false);
         }
+    }
+    const updateCurrency = async () => {
+        const currency = await getCurrency(setupConfig!.strikeUsername!);
+        setUsernameInvalid(!currency);
+        if (currency) {
+            setSetupConfig(c => ({ ...c, currency }))
+        }
+    }
+    const checkReacherEmail = async () => {
+        setReacherPrefixInvalid(false);
+        if (!setupConfig!.reacherEmailPrefix) {
+            return;
+        }
+        const available = await getReacherEmailAvailable(setupConfig!.reacherEmailPrefix!);
+        setReacherPrefixInvalid(!available);
     }
     const reloadAccount = async () => {
         try {
@@ -109,13 +123,20 @@ const Setup: React.FC = () => {
                                     <InputGroup>
                                         <Input
                                             placeholder="yourname"
-                                            value={setupConfig!.reacherEmailPrefix}
+                                            value={setupConfig!.reacherEmailPrefix ?? ""}
                                             onChange={v => setSetupConfig(c => ({ ...c, reacherEmailPrefix: v.target.value }))}
                                             required
                                             autoComplete="off"
+                                            isInvalid={reacherPrefixInvalid}
+                                            onBlur={checkReacherEmail}
                                         />
                                         <InputRightAddon children={reacherSuffix} />
                                     </InputGroup>
+                                    {reacherPrefixInvalid ?
+                                        (<FormHelperText textColor="red.500">{setupConfig.reacherEmailPrefix}{reacherSuffix} is taken. Try something else</FormHelperText>) :
+                                        (<FormHelperText>This is your reacher email where people can pay a tip to reach you.</FormHelperText>)
+                                    }
+
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Display Name</FormLabel>
@@ -126,6 +147,7 @@ const Setup: React.FC = () => {
                                         required
                                         autoComplete="off"
                                     />
+                                    <FormHelperText>This is the name people will see when referring to you in emails we send.</FormHelperText>
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Strike Username</FormLabel>
@@ -133,9 +155,12 @@ const Setup: React.FC = () => {
                                         placeholder="satoshi"
                                         value={setupConfig!.strikeUsername}
                                         onChange={v => setSetupConfig(c => ({ ...c, strikeUsername: v.target.value }))}
+                                        onBlur={() => updateCurrency()}
                                         required
                                         autoComplete="off"
                                     />
+                                    {usernameInvalid ? (<FormHelperText textColor="red.300">We couldn't find this user, so there's a good chance the username is invalid.</FormHelperText>) :
+                                        (<FormHelperText>This is the name people will see when you are mentioned in emails and on the payment page.</FormHelperText>)}
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Destination Email</FormLabel>
@@ -147,9 +172,10 @@ const Setup: React.FC = () => {
                                         required
                                         autoComplete="off"
                                     />
+                                    <FormHelperText>This is the inbox emails will go to once someone pays a tip.</FormHelperText>
                                 </FormControl>
                                 <FormControl>
-                                    <FormLabel>Tip Amount to be Reached (USD)</FormLabel>
+                                    <FormLabel>Tip Amount ({setupConfig.currency})</FormLabel>
                                     <InputGroup>
                                         <InputLeftAddon children={`$`} />
                                         <Input
@@ -165,6 +191,17 @@ const Setup: React.FC = () => {
                                             autoComplete="off"
                                         />
                                     </InputGroup>
+                                    <FormHelperText>This is the amount people must tip in order to get their emails delivered to your inbox.</FormHelperText>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel htmlFor='is-disabled' mb='0'>
+                                        Enabled?
+                                    </FormLabel>
+                                    <Switch id="is-disabled" isChecked={!setupConfig.disabled}
+                                        onChange={v => {
+                                            setSetupConfig(c => ({ ...c, disabled: !v.target.checked }))
+                                        }} />
+                                    <FormHelperText>You can disable your reacher email and nothing will happen if someone sends an email to that address. </FormHelperText>
                                 </FormControl>
                                 {error && <Text color="red">
                                     An error occurred. Please try again or see console for details.

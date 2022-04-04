@@ -7,7 +7,6 @@ public partial class DbReachable : BaseModel
     public Guid Id { get; set; }
     [MaxLength(Constants.StandardTextLength)]
     public string Name { get; set; }
-    public string Description { get; set; }
     [MaxLength(Constants.StandardTextLength)]
     public string ReacherEmailAddress { get; set; }
     [MaxLength(Constants.StandardTextLength)]
@@ -16,7 +15,9 @@ public partial class DbReachable : BaseModel
     public string StrikeUsername { get; set; }
     [Precision(18, 2)]
     public decimal CostUsdToReach { get; set; }
-    public bool ReplyIsFree { get; set; }
+    [MaxLength(10)]
+    public string? Currency { get; set; }
+    public bool Disabled { get; set; }
 
     [ForeignKey(nameof(User))]
     public Guid? UserId { get; set; }

@@ -2,7 +2,7 @@ import * as React from "react";
 //import qrCodeConfig from "./qrCodeConfig";
 import styles from "./QRCode.module.css";
 import QRCodeReact from 'qrcode.react';
-import lightning from '../lightning.svg';
+import lightning from '../../images/lightning.svg';
 import { Center, Box, Flex } from "@chakra-ui/react";
 
 const QRCode: React.FC<{ data: string, color: string, expired?: boolean, animationDuration: number, onClick?: (a: any) => any }> = ({

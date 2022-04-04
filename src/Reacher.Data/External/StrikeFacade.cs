@@ -12,14 +12,14 @@ public class StrikeFacade : IStrikeFacade
         _strikeClient = strikeClient;
     }
 
-    public async Task<Guid> CreateInvoice(string strikeUsername, decimal amountUSD, string description, Guid emailId)
+    public async Task<Guid> CreateInvoice(string strikeUsername, decimal amountUSD, string? currency, string description, Guid emailId)
     {
         var result = await _strikeClient.HandleAsync(strikeUsername, new()
         {
-            Amount = new Strike.Models.CurrencyAmount
+            Amount = new CurrencyAmount
             {
                 Amount = amountUSD.ToString("f2"),
-                Currency = Strike.Models.CurrencyAmountCurrency.USD
+                Currency = Enum.Parse<CurrencyAmountCurrency>(currency ?? "USD")
             },
             Description = description,
             CorrelationId = emailId.ToString()
@@ -37,11 +37,16 @@ public class StrikeFacade : IStrikeFacade
     {
         return _strikeClient.QuoteAsync(strikeInvoiceId);
     }
+
+    public Task<AccountProfile> GetProfile(string strikeUsername) { 
+        return _strikeClient.Profile2Async(strikeUsername);
+    }
 }
 
 public interface IStrikeFacade
 {
-    Task<Guid> CreateInvoice(string strikeUsername, decimal amountUSD, string description, Guid emailId);
+    Task<Guid> CreateInvoice(string strikeUsername, decimal amountUSD, string? currency, string description, Guid emailId);
     Task<InvoiceQuote> CreateLnInvoice(Guid strikeInvoiceId);
     Task<bool> InvoiceIsPaid(Guid strikeInvoiceId);
+    Task<AccountProfile> GetProfile(string strikeUsername);
 }

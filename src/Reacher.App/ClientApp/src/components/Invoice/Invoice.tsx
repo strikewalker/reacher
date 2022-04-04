@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import logo from '../../images/logo_light.svg';
 import { getButtonTextColorFromBg } from '../../util/color';
 import useInterval from '../../util/useInterval';
-import bitcoin from '../bitcoin.svg';
+import bitcoin from '../../images/bitcoin.svg';
 import { createLnInvoice, fetchInvoice, fetchInvoiceIsPaid, Invoice, LightningInvoice } from './invoiceRepo';
 import QRCode from "./QR";
 import { formatCurrency } from "./utils";

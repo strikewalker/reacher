@@ -1,9 +1,14 @@
 ﻿import {
-    Box, Center, Grid, Heading, Image, Link, Text, VStack
+    Box, Center, Grid, Heading, Image, Link, SimpleGrid, Text, VStack, Divider
 } from "@chakra-ui/react";
 import * as React from 'react';
 import logo from '../images/logo_light.svg';
-import bitcoin from './bitcoin.svg';
+import bitcoin from '../images/bitcoin.svg';
+import login from '../images/login.svg';
+import reachOut from '../images/reachOut.svg';
+import tipRequest from '../images/tipRequest.svg';
+import pay from '../images/pay.svg';
+import delivered from '../images/delivered.svg';
 
 import { orangeColor } from './Common';
 import Button from './Button';
@@ -11,8 +16,10 @@ import Button from './Button';
 const toSetup =
     (<VStack>
         <Button href="/setup">Log In with Strike</Button>
-        <Text fontSize="sm">to set up <Text as="span" color={orangeColor}>your Reacher email</Text></Text>
+        <Text fontSize="sm">to set up your <b>Reacher</b> email</Text>
     </VStack>);
+
+const spacing = { base: 3, md: 5, lg: 10 };
 
 const Home: React.FC = () => {
     return (<>
@@ -30,35 +37,44 @@ const Home: React.FC = () => {
                                 Get Paid to Get Reached
                             </Heading>
                             <Text fontSize="1.5em">
-                                Reach someone important
+                                Filter out the noise
                             </Text>
                         </VStack>
                     </Center>
                     {toSetup}
-                    <Box border="2px solid white" borderRadius={20} padding={10}>
-                        <VStack spacing={4} style={{ alignContent: "flex-start", width: "100%" }}>
-                            <Heading as="h4">
-                                How it works
-                            </Heading>
-                            <Text width="100%">
-                                <b>Step 1.</b><br /> Sign up for a free <b>Reacher</b> email address (e.g. <i>example@reacher.me</i>) that forwards to your actual email address (e.g. <i>personal@gmail.com</i>).
-                            </Text>
-                            <Text width="100%">
-                                <b>Step 2.</b><br /> You make your <b>Reacher</b> email address (e.g. <i>example@reacher.me</i>) public (e.g. in your Twitter profile).
-                            </Text>
-                            <Text width="100%">
-                                <b>Step 3.</b><br /> Someone sends you an email
-                            </Text>
-                            <Text width="100%">
-                                <b>Step 4.</b><br /> They get an email from <i>Reacher</i> requesting a <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin payment to ensure you see their email.
-                            </Text>
-                            <Text width="100%">
-                                <b>Step 5.</b><br /> They make the payment, and their email gets sent to your actual email address (e.g. <i>personal@gmail.com</i>)
-                            </Text>
-                            <Text width="100%">
-                                <b>Step 6.</b><br /> You respond from your email address through <i>Reacher</i>, and the recipient never sees your actual email address.
-                            </Text>
-                        </VStack>
+                    <Box border="2px solid white" borderRadius={20} padding={spacing} maxW="3xl">
+                        <Heading as="h4" textAlign="center" mb={2}>
+                            How it works
+                        </Heading>
+                        <Divider mb={spacing}/>
+                        <SimpleGrid columns={2} spacing={spacing}>
+                            <Box>
+                                <Heading as="h5" fontSize="2xl" mb={1}>Step 1</Heading>
+                                <Text>Sign up for a free <b>Reacher</b> email address that forwards to your actual email address.</Text>
+                            </Box>
+                            <Image src={login} alt='Sign up for Reacher email' />
+                            <Image src={reachOut} alt='Someone sends an email' />
+                            <Box>
+                                <Heading as="h5" fontSize="2xl" mb={1}>Step 2</Heading>
+                                <Text>Someone sends an email to your <b>Reacher</b> email address.</Text>
+                            </Box>
+                            <Box>
+                                <Heading as="h5" fontSize="2xl" mb={1}>Step 3</Heading>
+                                <Text>They get an email from <i>Reacher</i> requesting a <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin tip to ensure you see their email.</Text>
+                            </Box>
+                            <Image src={tipRequest} alt='They get a tip request' />
+                            <Image src={pay} alt='Reacher website for payment' />
+                            <Box>
+                                <Heading as="h5" fontSize="2xl" mb={1}>Step 4</Heading>
+                                <Text>They get directed to the Reacher website to pay the tip.</Text>
+                            </Box>
+                            <Box>
+                                <Heading as="h5" fontSize="2xl" mb={1}>Step 5</Heading>
+                                <Text mb={2}>You receive an email from <i>Reacher</i> with their message.</Text>
+                                <Text>You can reply to this email to respond to them.</Text>
+                            </Box>
+                            <Image src={delivered} alt='Their email gets delivered' />
+                        </SimpleGrid>
                     </Box>
                     {toSetup}
                     <Text pt={6}>

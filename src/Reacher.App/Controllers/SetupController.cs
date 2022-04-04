@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Reacher.App.Models;
 using Reacher.Data;
+using Reacher.Data.External;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Reacher.App.Controllers;
@@ -16,12 +17,14 @@ public class SetupController : ControllerBase
     private readonly ILogger<SetupController> _logger;
     private readonly AppDbContext _db;
     private readonly ReacherSettings _settings;
+    private readonly IStrikeFacade _strikeFacade;
 
-    public SetupController(ILogger<SetupController> logger, AppDbContext db, IOptions<ReacherSettings> settings)
+    public SetupController(ILogger<SetupController> logger, AppDbContext db, IOptions<ReacherSettings> settings, IStrikeFacade strikeFacade)
     {
         _logger = logger;
         _db = db;
         _settings = settings.Value;
+        _strikeFacade = strikeFacade;
     }
 
     private async Task<(Guid UserId, string Email, string StrikeUsername, string Name)> GetLoggedInUser()
@@ -47,9 +50,9 @@ public class SetupController : ControllerBase
             dbUser = new()
             {
                 Id = user.UserId,
-                EmailAddress = user.Email,
-                Name = user.Name,
-                StrikeUsername = user.StrikeUsername,
+                EmailAddress = user.Email ?? "unknown",
+                Name = user.Name ?? "unknown",
+                StrikeUsername = user.StrikeUsername ?? "unknown",
             };
             _db.Users.Add(dbUser);
             await _db.SaveChangesAsync();
@@ -64,7 +67,7 @@ public class SetupController : ControllerBase
                 await _db.SaveChangesAsync();
             }
         }
-        var toReplace = _settings.IsTest == true ? "@testing.reacher.me" : "@reacher.me";
+        var toReplace = _settings.IsTest ? "@testing.reacher.me" : "@reacher.me";
         var setupModel = new SetupModel
         {
             User = new() { Name = user.Name, StrikeUsername = user.StrikeUsername },
@@ -74,17 +77,44 @@ public class SetupController : ControllerBase
                 Price = reachable?.CostUsdToReach ?? .01m,
                 ReacherEmailPrefix = reachable?.ReacherEmailAddress?.Replace(toReplace, ""),
                 StrikeUsername = reachable?.StrikeUsername ?? user.StrikeUsername,
-                DestinationEmail = reachable?.ToEmailAddress ?? user.Email
+                DestinationEmail = reachable?.ToEmailAddress ?? user.Email,
+                Currency = reachable?.Currency ?? "USD",
+                Disabled = reachable?.Disabled ?? false,
             }
         };
         return setupModel;
     }
+
+    [HttpGet("currency")]
+    public async Task<string?> GetCurrency(string strikeUsername)
+    {
+        try
+        {
+            var publicUser = await _strikeFacade.GetProfile(strikeUsername);
+            return publicUser?.Currencies?.FirstOrDefault(c => c.IsDefaultCurrency)?.Currency.ToString();
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError(exc, "Unable to find Invoiceable currency for {User}", strikeUsername);
+        }
+        return null;
+    }
+
+    [HttpGet("isavailable")]
+    public async Task<bool> GetIsAvailable(string prefix)
+    {
+        var user = await GetLoggedInUser();
+        var otherHas = await _db.Reachables.AnyAsync(r => r.ReacherEmailAddress == getReacherEmail(prefix) && r.UserId != user.UserId);
+        return !otherHas;
+    }
+
     [HttpPost]
     public async Task Post([FromBody] SetupConfig config)
     {
         var user = await GetLoggedInUser();
         var reachable = await _db.Reachables.FirstOrDefaultAsync(r => r.UserId == user.UserId);
-        if (reachable == null) {
+        if (reachable == null)
+        {
             reachable = new()
             {
                 UserId = user.UserId,
@@ -93,11 +123,17 @@ public class SetupController : ControllerBase
         }
 
         reachable.Name = config.Name;
-        reachable.Description = config.Name;
         reachable.StrikeUsername = config.StrikeUsername;
-        reachable.ReacherEmailAddress = $"{config.ReacherEmailPrefix}@{(_settings.IsTest ? "testing.": "")}reacher.me";
+        reachable.ReacherEmailAddress = getReacherEmail(config.ReacherEmailPrefix);
         reachable.ToEmailAddress = config.DestinationEmail;
         reachable.CostUsdToReach = config.Price;
+        reachable.Currency = config.Currency;
+        reachable.Disabled = config.Disabled;
         await _db.SaveChangesAsync();
+    }
+
+    private string getReacherEmail(string prefix)
+    {
+        return $"{prefix}@{(_settings.IsTest ? "testing." : "")}reacher.me";
     }
 }

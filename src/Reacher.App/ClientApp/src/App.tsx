@@ -45,7 +45,7 @@ export default class App extends React.Component {
             <ConfigProvider avatarRedirectUrl="https://avatar-redirect.appspot.com">
                 <ChakraProvider theme={theme}>
                     <Route exact path='/' component={Home} />
-                    <Route path='/invoice/:id' component={Invoice} />
+                    <Route path='/tip/:id' component={Invoice} />
                     <Route path='/setup' component={Setup} />
                 </ChakraProvider>
             </ConfigProvider>

@@ -27,7 +27,6 @@ public class InvoiceService : IInvoiceService
             Paid = e.InvoiceStatus == InvoiceStatus.Paid,
             Reachable = new()
             {
-                Description = e.Reachable.Description,
                 EmailAddress = e.Reachable.ReacherEmailAddress,
                 Id = e.Reachable.Id,
                 Name = e.Reachable.Name

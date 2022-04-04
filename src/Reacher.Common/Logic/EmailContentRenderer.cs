@@ -56,7 +56,7 @@ All you gotta do is add a **{cost:c}** tip, then Reacher will deliver your email
             },
             OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**" },
             Actions = new List<EmailAction> {
-                new(){ActionName = "Add a Tip Now", Url = "https://www.reacher.me/invoice/" + emailId}
+                new(){ActionName = "Add a Tip Now", Url = "https://www.reacher.me/tip/" + emailId}
             },
             MarkdownContentItemsAfter = new[] {
                 @$"Please note that **all tips go directly to {reacherName}**. 

@@ -10,4 +10,5 @@ public enum EmailType
     OutboundForward = 6,
     TooSoon = 7,
     PaymentSuccess = 8,
+    Disabled = 9,
 }

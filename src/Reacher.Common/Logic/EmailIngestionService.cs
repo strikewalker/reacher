@@ -86,6 +86,11 @@ public class EmailIngestionService : IEmailIngestionService
                 incomingEmail.Type = EmailType.Failed;
                 await _db.SaveChangesAsync();
             }
+            else if (reachable.Disabled)
+            {
+                incomingEmail.Type = EmailType.Disabled;
+                await _db.SaveChangesAsync();
+            }
             else
             {
                 incomingEmail.Reachable = reachable;
@@ -100,7 +105,7 @@ public class EmailIngestionService : IEmailIngestionService
                     incomingEmail.Type = EmailType.InboundReach;
                     incomingEmail.CostUsd = reachable.CostUsdToReach;
                     await _db.SaveChangesAsync();
-                    incomingEmail.StrikeInvoiceId = await _strikeFacade.CreateInvoice(reachable.StrikeUsername, reachable.CostUsdToReach, $"Email from {incomingEmail.FromEmailAddress}", incomingEmail.Id);
+                    incomingEmail.StrikeInvoiceId = await _strikeFacade.CreateInvoice(reachable.StrikeUsername, reachable.CostUsdToReach, reachable.Currency, $"Email from {incomingEmail.FromEmailAddress}", incomingEmail.Id);
                     await _db.SaveChangesAsync();
 
                     var body = await _emailContentRenderer.GetPayEmailBody(reachable.ReacherEmailAddress, reachable.Name, incomingEmail.Id, incomingEmail.Subject ?? "(no subject)", incomingEmail.CostUsd ?? 0, incomingEmail.Body);
