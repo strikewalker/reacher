@@ -78,7 +78,7 @@ public class SetupController : ControllerBase
                 ReacherEmailPrefix = reachable?.ReacherEmailAddress?.Replace(toReplace, ""),
                 StrikeUsername = reachable?.StrikeUsername ?? user.StrikeUsername,
                 DestinationEmail = reachable?.ToEmailAddress ?? user.Email,
-                Currency = reachable?.Currency ?? "USD",
+                Currency = reachable?.Currency ?? (await GetCurrency(user.StrikeUsername)) ?? "USD",
                 Disabled = reachable?.Disabled ?? false,
             }
         };
