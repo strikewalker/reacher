@@ -4,13 +4,13 @@ import { FC, ReactNode, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import logo from '../../images/logo_light.svg';
-import { getButtonTextColorFromBg } from '../../util/color';
 import useInterval from '../../util/useInterval';
 import bitcoin from '../../images/bitcoin.svg';
 import { createLnInvoice, fetchInvoice, fetchInvoiceIsPaid, Invoice, LightningInvoice } from './invoiceRepo';
 import QRCode from "./QR";
 import { formatCurrency } from "./utils";
 import Button from '../Button';
+import { ReacherFooter } from '../Common';
 
 const userColor = "#fdaa26";
 
@@ -80,7 +80,7 @@ const InvoiceComponent: FC = () => {
             <Text fontSize="lg" style={{ textAlign: "center" }}>
                 Thank you. Your email has been delivered to <ReacherName />.
             </Text>
-            <Text>
+            <Text style={{ textAlign: "center" }}>
                 <Link
                     href="/"
                     isExternal
@@ -117,7 +117,7 @@ const InvoiceComponent: FC = () => {
                     <Text style={{ textAlign: "center" }}>
                         then Reacher will deliver your email
                     </Text>
-                <Text fontSize='sm' pt={2} color="rgba(255,255,255,0.6)">Just <b>scan</b> or <b>click</b> the QR code below</Text>
+                    <Text fontSize='sm' pt={2} color="rgba(255,255,255,0.6)">Just <b>scan</b> or <b>click</b> the QR code below</Text>
                     <Box mt={[3, 0]}>
                         <a href={`lightning:${lnInvoice.lnInvoiceId}`}>
                             {lnInvoice.expirationInSeconds && (
@@ -133,11 +133,11 @@ const InvoiceComponent: FC = () => {
                     <Text fontSize='sm' color="rgba(255,255,255,0.6)"> or paste it in your <Image src={bitcoin} height="1.3rem" display="inline" /> Bitcoin lightning wallet</Text>
                     <Box>
                         {isExpired ? (
-                            <Button onClick={refreshLnInvoice}>
+                            <Button key="refresh" onClick={refreshLnInvoice}>
                                 Refresh
                             </Button>
                         ) : (
-                            <Button
+                            <Button key="copy"
                                 onClick={() => {
                                     navigator.clipboard.writeText(lnInvoice.lnInvoiceId);
                                     setCopied(true);
@@ -162,21 +162,8 @@ const InvoiceComponent: FC = () => {
                         </Link>{" "}
                         to get started with <b>Strike</b>.
                     </Text>
-                    <Center pb={6} pt={4} fontSize="sm">
-                        <Link mr={2}
-                            href="https://strike.me/en/legal/privacy"
-                            isExternal
-                        >
-                            Privacy Notice
-                        </Link>{"  |  "}
-                        <Link ml={2}
-                            href="https://strike.me/en/legal/tos"
-                            isExternal
-                        >
-                            Terms of Service
-                        </Link>
-                    </Center>
                 </VStack>
+                <ReacherFooter />
             </Box>
     }
 

@@ -10,7 +10,7 @@ import tipRequest from '../images/tipRequest.svg';
 import pay from '../images/pay.svg';
 import delivered from '../images/delivered.svg';
 
-import { orangeColor } from './Common';
+import { orangeColor, ReacherFooter } from './Common';
 import Button from './Button';
 
 const toSetup =
@@ -46,7 +46,7 @@ const Home: React.FC = () => {
                         <Heading as="h4" textAlign="center" mb={2}>
                             How it works
                         </Heading>
-                        <Divider mb={spacing}/>
+                        <Divider mb={spacing} />
                         <SimpleGrid columns={2} spacing={spacing}>
                             <Box>
                                 <Heading as="h5" fontSize="2xl" mb={1}>Step 1</Heading>
@@ -88,20 +88,7 @@ const Home: React.FC = () => {
                         </Link>{" "}
                         to download Strike and get started.
                     </Text>
-                    <Center pb={6}>
-                        <Link mr={2}
-                            href="https://strike.me/en/legal/privacy"
-                            isExternal
-                        >
-                            Privacy Notice
-                        </Link>{"  |  "}
-                        <Link ml={2}
-                            href="https://strike.me/en/legal/tos"
-                            isExternal
-                        >
-                            Terms of Service
-                        </Link>
-                    </Center>
+                    <ReacherFooter/>
                 </VStack>
             </Box>
         </Grid>

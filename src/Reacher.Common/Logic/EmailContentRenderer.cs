@@ -5,20 +5,19 @@ namespace Reacher.Common.Logic;
 public interface IEmailContentRenderer
 {
     Task<string> GetFowardEmail(string body, string fromEmail, string? fromName, string subject, decimal amount, string reacherEmail);
-    Task<string> GetPayEmailBody(string reacherEmail, string reacherName, Guid emailId, string subject, decimal cost, string html);
-    Task<string> GetPaymentSuccessEmailBody(string reacherEmail, string reacherName, string subject, decimal cost, string html);
+    Task<string> GetPayEmailBody(string reacherEmail, string reacherName, Guid emailId, string subject, decimal cost, string html, int attachmentCount);
+    Task<string> GetPaymentSuccessEmailBody(string reacherEmail, string reacherName, string subject, decimal cost, string html, int attachmentCount);
 }
 
 public class EmailContentRenderer : IEmailContentRenderer
 {
-    private readonly IEmailContentProvider _contentProvider;
     private readonly ITemplateService _templateService;
 
     public EmailContentRenderer(ITemplateService templateService)
     {
         _templateService = templateService;
     }
-    public Task<string> GetPaymentSuccessEmailBody(string reacherEmail, string reacherName, string subject, decimal cost, string html)
+    public Task<string> GetPaymentSuccessEmailBody(string reacherEmail, string reacherName, string subject, decimal cost, string html, int attachmentCount)
     {
         var email = new ReacherEmail
         {
@@ -28,7 +27,7 @@ public class EmailContentRenderer : IEmailContentRenderer
 
 We just wanted to let you know that your tip of **{cost:c}** was received, and Reacher has delivered your email to **{reacherName}**."
             },
-            OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**" },
+            OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**", AttachmentCount = attachmentCount },
             MarkdownContentItemsAfter = new[] {
                 @$"Please note that **all tips go directly to {reacherName}**. 
  
@@ -40,7 +39,7 @@ A direct response to this email will be *ignored*."
         return _templateService.GetTemplateHtmlAsStringAsync("Main", new RazorReacherEmail(email));
     }
 
-    public Task<string> GetPayEmailBody(string reacherEmail, string reacherName, Guid emailId, string subject, decimal cost, string html)
+    public Task<string> GetPayEmailBody(string reacherEmail, string reacherName, Guid emailId, string subject, decimal cost, string html, int attachmentCount)
     {
         var email = new ReacherEmail
         {
@@ -54,7 +53,7 @@ We see you wanted to reach **{reacherName}**, but your email hasn't been deliver
 
 All you gotta do is add a **{cost:c}** tip, then Reacher will deliver your email below."
             },
-            OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**" },
+            OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**", AttachmentCount = attachmentCount },
             Actions = new List<EmailAction> {
                 new(){ActionName = "Add a Tip Now", Url = "https://www.reacher.me/tip/" + emailId}
             },

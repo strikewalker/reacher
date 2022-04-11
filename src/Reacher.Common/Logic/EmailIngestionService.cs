@@ -7,35 +7,54 @@ public class EmailIngestionService : IEmailIngestionService
     private readonly ISendGridParser _sendGridParser;
     private readonly IStrikeFacade _strikeFacade;
     private readonly ISendGridFacade _sendGridFacade;
+    private readonly IEmailContentService _emailContentService;
 
-    public EmailIngestionService(AppDbContext db, IEmailContentRenderer emailContentRenderer, ISendGridParser sendGridParser, IStrikeFacade strikeFacade, ISendGridFacade sendGridFacade)
+    public EmailIngestionService(AppDbContext db, IEmailContentRenderer emailContentRenderer, ISendGridParser sendGridParser,
+        IStrikeFacade strikeFacade, ISendGridFacade sendGridFacade, IEmailContentService emailContentService)
     {
         _db = db;
         _emailContentRenderer = emailContentRenderer;
         _sendGridParser = sendGridParser;
         _strikeFacade = strikeFacade;
         _sendGridFacade = sendGridFacade;
+        _emailContentService = emailContentService;
     }
 
     public async Task IngestEmail(Stream emailMessage)
     {
-        var incomingEmail = await _sendGridParser.ParseSendGridInboundEmail(emailMessage);
-        incomingEmail.Id = Guid.NewGuid();
+        using var emailStream = new MemoryStream();
+        await emailMessage.CopyToAsync(emailStream);
+        // 20mb limit
+        emailStream.Position = 0;
+        var emailId = Guid.NewGuid();
+        var parsedEmail = await _sendGridParser.ParseSendGridInboundEmail(emailStream);
+        emailStream.Position = 0;
+        var incomingEmail = _sendGridParser.MapInboundEmailToDbEmail(parsedEmail);
+        incomingEmail.Id = emailId;
+        incomingEmail.ContentLength = emailStream.Length;
         _db.Emails.Add(incomingEmail);
         await _db.SaveChangesAsync();
 
-        Guid? emailId = null;
+        Guid? originalEmailId = null;
         var toEmailAddress = incomingEmail.ToEmailAddress;
         var splitEmail = toEmailAddress?.Split('+', '@');
         if (splitEmail?.Length == 3 && Guid.TryParse(splitEmail[1], out var emailIdValue))
         {
-            emailId = emailIdValue;
+            originalEmailId = emailIdValue;
             toEmailAddress = $"{splitEmail[0]}@{splitEmail[2]}";
         }
 
-        if (emailId.HasValue)
+        // Max ~20mb
+        var tooBig = emailStream.Length > 20_000_000;
+        if (!tooBig || originalEmailId.HasValue)
         {
-            var originalEmail = await _db.Emails.Where(e => e.Id == emailId && e.ToEmailAddress == toEmailAddress).Include(e => e.Reachable).FirstOrDefaultAsync();
+            await _emailContentService.SaveInboundEmail(emailId, emailStream);
+            emailStream.Position = 0;
+        }
+
+        if (originalEmailId.HasValue)
+        {
+            var originalEmail = await _db.Emails.Where(e => e.Id == originalEmailId && e.ToEmailAddress == toEmailAddress).Include(e => e.Reachable).FirstOrDefaultAsync();
             if (originalEmail != null)
             {
                 incomingEmail.OriginalEmailId = originalEmail.Id;
@@ -43,7 +62,7 @@ public class EmailIngestionService : IEmailIngestionService
                 incomingEmail.Type = EmailType.OutboundReply;
                 await _db.SaveChangesAsync();
 
-                var body = incomingEmail.Body;
+                var body = parsedEmail.Html;
                 var split = body.Split("~--~");
                 if (split.Length == 5)
                     body = split[0] + split[2] + split[4];
@@ -58,8 +77,10 @@ public class EmailIngestionService : IEmailIngestionService
                     Body = body,
                 };
 
+                var forwardedEmailId = Guid.NewGuid();
                 var forwardedEmail = new DbEmail()
                 {
+                    Id = forwardedEmailId,
                     Type = EmailType.OutboundForward,
                     ReachableId = originalEmail.ReachableId,
                     OriginalEmailId = incomingEmail.Id,
@@ -68,12 +89,12 @@ public class EmailIngestionService : IEmailIngestionService
                     FromEmailAddress = newValues.FromEmailAddress,
                     FromEmailName = newValues.FromEmailName,
                     Subject = newValues.Subject,
-                    Body = newValues.Body,
                 };
                 _db.Emails.Add(forwardedEmail);
                 await _db.SaveChangesAsync();
+                await _emailContentService.SaveOutboundEmail(forwardedEmailId, newValues.Body);
 
-                await _sendGridFacade.SendEmail(newValues.ToEmailAddress, newValues.ToEmailName, newValues.FromEmailAddress, newValues.FromEmailName, newValues.Subject, newValues.Body);
+                await _sendGridFacade.SendEmail(newValues.ToEmailAddress, newValues.ToEmailName, newValues.FromEmailAddress, newValues.FromEmailName, newValues.Subject, newValues.Body, emailAttachments: parsedEmail.GetAttachments());
                 forwardedEmail.SentDate = DateTime.UtcNow;
                 await _db.SaveChangesAsync();
             }
@@ -85,15 +106,21 @@ public class EmailIngestionService : IEmailIngestionService
             {
                 incomingEmail.Type = EmailType.Failed;
                 await _db.SaveChangesAsync();
+                return;
             }
-            else if (reachable.Disabled)
+            incomingEmail.Reachable = reachable;
+            if (reachable.Disabled)
             {
                 incomingEmail.Type = EmailType.Disabled;
                 await _db.SaveChangesAsync();
             }
+            else if (tooBig)
+            {
+                incomingEmail.Type = EmailType.TooBig;
+                await _db.SaveChangesAsync();
+            }
             else
             {
-                incomingEmail.Reachable = reachable;
                 var mostRecentInboundFrom = _db.Emails.Where(e => e.ReachableId == reachable.Id && e.Type == EmailType.InboundReach && e.FromEmailAddress == incomingEmail.FromEmailAddress).OrderByDescending(e => e.CreatedDate).FirstOrDefault();
                 if (mostRecentInboundFrom?.CreatedDate > DateTime.UtcNow.AddMinutes(-2))
                 {
@@ -108,7 +135,7 @@ public class EmailIngestionService : IEmailIngestionService
                     incomingEmail.StrikeInvoiceId = await _strikeFacade.CreateInvoice(reachable.StrikeUsername, reachable.CostUsdToReach, reachable.Currency, $"Email from {incomingEmail.FromEmailAddress}", incomingEmail.Id);
                     await _db.SaveChangesAsync();
 
-                    var body = await _emailContentRenderer.GetPayEmailBody(reachable.ReacherEmailAddress, reachable.Name, incomingEmail.Id, incomingEmail.Subject ?? "(no subject)", incomingEmail.CostUsd ?? 0, incomingEmail.Body);
+                    var body = await _emailContentRenderer.GetPayEmailBody(reachable.ReacherEmailAddress, reachable.Name, incomingEmail.Id, incomingEmail.Subject ?? "(no subject)", incomingEmail.CostUsd ?? 0, parsedEmail.Html, parsedEmail.Attachments?.Length ?? 0);
 
                     var newValues = new
                     {
@@ -120,8 +147,10 @@ public class EmailIngestionService : IEmailIngestionService
                         Body = body,
                     };
 
+                    var forwardedEmailId = Guid.NewGuid();
                     var forwardedEmail = new DbEmail()
                     {
+                        Id = forwardedEmailId,
                         Type = EmailType.PaymentRequest,
                         Reachable = reachable,
                         OriginalEmailId = incomingEmail.Id,
@@ -130,10 +159,10 @@ public class EmailIngestionService : IEmailIngestionService
                         FromEmailAddress = newValues.FromEmailAddress,
                         FromEmailName = newValues.FromEmailName,
                         Subject = newValues.Subject,
-                        Body = newValues.Body,
                     };
                     _db.Emails.Add(forwardedEmail);
                     await _db.SaveChangesAsync();
+                    await _emailContentService.SaveOutboundEmail(forwardedEmailId, newValues.Body);
 
                     await _sendGridFacade.SendEmail(newValues.ToEmailAddress, newValues.ToEmailName, newValues.FromEmailAddress, newValues.FromEmailName, newValues.Subject, newValues.Body);
 

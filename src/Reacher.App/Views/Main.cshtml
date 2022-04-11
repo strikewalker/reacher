@@ -450,14 +450,6 @@
 																		<hr />
 																	</td>
 																</tr>
-																<tr>
-																	<td style="font-family:'Roboto', sans-serif;font-size:14px;font-weight:200">
-																		<b>Subject: </b> @Model.OtherEmail.Subject
-																	</td>
-																</tr>
-																<tr>
-																	<td height="10" style="font-size:10px;line-height:10px;">&nbsp;</td>
-																</tr>
 																@if (Model.OtherEmail.From != null)
 																{
 																	<tr>
@@ -467,6 +459,25 @@
 																	</tr>
 																	<tr>
 																		<td height="10" style="font-size:10px;line-height:10px;">&nbsp;</td>
+																	</tr>
+																}
+																<tr>
+																	<td height="10" style="font-size:10px;line-height:10px;">&nbsp;</td>
+																</tr>
+																<tr>
+																	<td style="font-family:'Roboto', sans-serif;font-size:14px;font-weight:200">
+																		<b>Subject: </b> @Model.OtherEmail.Subject
+																	</td>
+																</tr>
+																@if (Model.OtherEmail.AttachmentCount > 0)
+																{
+																	<tr>
+																		<td height="10" style="font-size:10px;line-height:10px;">&nbsp;</td>
+																	</tr>
+																	<tr>
+																		<td style="font-family:'Roboto', sans-serif;font-size:14px;font-weight:200">
+																			<b>Attachments: </b> @Model.OtherEmail.AttachmentCount
+																		</td>
 																	</tr>
 																}
 																<tr>

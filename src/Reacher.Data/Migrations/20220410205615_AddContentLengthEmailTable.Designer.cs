@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reacher.Data;
 
@@ -11,9 +12,10 @@ using Reacher.Data;
 namespace Reacher.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220410205615_AddContentLengthEmailTable")]
+    partial class AddContentLengthEmailTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,6 +30,10 @@ namespace Reacher.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("ContentLength")
                         .HasColumnType("bigint");
 
@@ -40,12 +46,10 @@ namespace Reacher.Data.Migrations
 
                     b.Property<string>("FromEmailAddress")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FromEmailName")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("InvoiceStatus")
                         .HasColumnType("int");
@@ -75,12 +79,10 @@ namespace Reacher.Data.Migrations
 
                     b.Property<string>("ToEmailAddress")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ToEmailName")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");

@@ -10,12 +10,15 @@ public partial class DbEmail : BaseModel
     public Guid Id { get; set; }
     [ForeignKey(nameof(TypeRef)), DefaultValue(EmailType.New)]
     public EmailType Type { get; set; }
-    public string Body { get; set; }
     [MaxLength(Constants.MaxSubjectLength)]
     public string Subject { get; set; }
+    [MaxLength(Constants.MaxEmailLength)]
     public string FromEmailAddress { get; set; }
+    [MaxLength(Constants.StandardTextLength)]
     public string? FromEmailName { get; set; }
+    [MaxLength(Constants.MaxEmailLength)]
     public string ToEmailAddress { get; set; }
+    [MaxLength(Constants.StandardTextLength)]
     public string? ToEmailName { get; set; }
     public DateTime? SentDate { get; set; }
 
@@ -30,6 +33,7 @@ public partial class DbEmail : BaseModel
     public decimal? CostUsd { get; set; }
     public DateTime? PaidDate { get; set; }
     public Guid? StrikeInvoiceId { get; set; }
+    public long? ContentLength { get; set; }
 
     //references
     public virtual EnumTable<EmailType> TypeRef { get; set; }

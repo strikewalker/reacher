@@ -11,4 +11,5 @@ public enum EmailType
     TooSoon = 7,
     PaymentSuccess = 8,
     Disabled = 9,
+    TooBig = 10,
 }

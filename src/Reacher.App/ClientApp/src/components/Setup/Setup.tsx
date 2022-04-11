@@ -8,10 +8,10 @@
 import * as React from 'react';
 import logo from '../../images/logo_light.svg';
 import Button from '../Button';
+import { isTest, ReacherFooter } from "../Common";
 import { getSetupModel, LoggedInUser, SetupConfig, updateSetupConfig, getCurrency, getReacherEmailAvailable } from './setupRepo';
 
 
-const isTest = !!["localhost", "test"].find(f => window.location.host.indexOf(f) > -1);
 const reacherSuffix = `@${(isTest ? "testing." : "")}reacher.me`;
 const userColor = "#fdaa26";
 
@@ -203,6 +203,21 @@ const Setup: React.FC = () => {
                                         }} />
                                     <FormHelperText>You can disable your reacher email and nothing will happen if someone sends an email to that address. </FormHelperText>
                                 </FormControl>
+                                <FormControl>
+                                    <FormHelperText>By hitting 'Submit' below, you are agreeing to the {" "}
+                                        <Link color={userColor}
+                                            href="https://strike.me/en/legal/tos"
+                                            isExternal
+                                        >
+                                            Terms of Service
+                                        </Link>{" and "}
+                                        <Link color={userColor}
+                                            href="https://strike.me/en/legal/privacy"
+                                            isExternal
+                                        >
+                                            Privacy Policy
+                                        </Link></FormHelperText>
+                                </FormControl>
                                 {error && <Text color="red">
                                     An error occurred. Please try again or see console for details.
                                 </Text>}
@@ -217,6 +232,7 @@ const Setup: React.FC = () => {
                         </form>
                     </Box>
                 </VStack>
+                <ReacherFooter />
             </Box>
         </Grid>
     </>);

@@ -22,7 +22,7 @@ public class SendGridFacade : ISendGridFacade
         return mail;
     }
 
-    public async Task SendEmail(string toEmail, string? toEmailName, string fromEmail, string? fromName, string subject, string bodyHtml, string? replyToEmail = null)
+    public async Task SendEmail(string toEmail, string? toEmailName, string fromEmail, string? fromName, string subject, string bodyHtml, string? replyToEmail = null, IEnumerable<Attachment>? emailAttachments = null)
     {
         var message = getDefaultEmail();
 
@@ -37,6 +37,8 @@ public class SendGridFacade : ISendGridFacade
         message.AddTo(new EmailAddress(toEmail, toEmailName));
         message.Subject = subject;
         message.AddContent("text/html", bodyHtml);
+        if (emailAttachments?.Any() == true)
+            message.AddAttachments(emailAttachments);
 
         await _sendGridClient.SendEmailAsync(message);
     }
@@ -44,5 +46,5 @@ public class SendGridFacade : ISendGridFacade
 
 public interface ISendGridFacade
 {
-    Task SendEmail(string toEmail, string? toEmailName, string fromEmail, string? fromName, string subject, string bodyHtml, string? replyToEmail = null);
+    Task SendEmail(string toEmail, string? toEmailName, string fromEmail, string? fromName, string subject, string bodyHtml, string? replyToEmail = null, IEnumerable<Attachment>? emailAttachments = null);
 }

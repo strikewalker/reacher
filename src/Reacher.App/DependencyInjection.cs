@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
 using Reacher.App.Services;
 using Reacher.Common.Utilities;
@@ -13,6 +14,11 @@ public static class DependencyInjection
 {
     public static void AddDependencies(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAzureClients(builder =>
+        {
+            builder.AddBlobServiceClient(configuration.GetConnectionString("AzureStorage"));
+        });
+        services.AddScoped<IEmailContentService, EmailContentService>();
         services.Configure<ReacherSettings>(configuration.GetSection("ReacherSettings"));
         services.AddDbContext<AppDbContext>(opts =>
         {
@@ -28,7 +34,6 @@ public static class DependencyInjection
             client.BaseAddress = new Uri(settings.StrikeApiUrl);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.StrikeApiKey);
         });
-        //services.AddSingleton<IEmailContentProvider, EmailContentProvider>();
         services.AddScoped<ITemplateService, TemplateService>();
         services.AddScoped<IEmailContentRenderer, EmailContentRenderer>();
         services.AddScoped<IEmailIngestionService, EmailIngestionService>();

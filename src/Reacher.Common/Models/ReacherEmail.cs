@@ -59,6 +59,7 @@ public class EmailContent
     public string Label { get; set; }
     public string Html { get; set; }
     public string? From { get; set; }
+    public int AttachmentCount { get; internal set; }
 }
 
 public static class MarkdownHelper
