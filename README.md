@@ -26,7 +26,13 @@ You will need to set these secrets to run the `Reacher.App` and `Reacher.Tests` 
     "AppDb": "[SQL Server Connection String]",
     "AzureStorage": "[Azure Storage Connection String]"
   },
+  "Oidc": {
+    "Issuer": "[https://auth.next.strike.me/]",
+    "ClientId": "[Strike Client App ID]",
+    "ClientSecret": "[Strike Client App Secret]"
+  },
   "ReacherSettings": {
+    "StrikeApiUrl": "[Strike API URL]",
     "StrikeApiKey": "[Strike API Key]",
     "SendGridApiKey": "[SendGrid API Key]"
   }
