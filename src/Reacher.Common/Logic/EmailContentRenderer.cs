@@ -49,9 +49,9 @@ A direct response to this email will be *ignored*."
 
 We see you wanted to reach **{reacherName}**, but your email hasn't been delivered yet.
 
-**{reacherName}** uses Reacher to know which messages are worth reading.
+**{reacherName}** uses Reacher to prevent spam from entering their inbox.
 
-All you gotta do is add a **{cost:c}** tip, then Reacher will deliver your email below."
+All you gotta do is add a **{cost:c}** payment to prove you are not sending spam. Reacher will then deliver your email below."
             },
             OtherEmail = new() { Html = html, Subject = subject, Label = "**Your Email:**", AttachmentCount = attachmentCount },
             Actions = new List<EmailAction> {
