@@ -10,4 +10,6 @@ public partial class DbUser : BaseModel
     public string EmailAddress { get; set; }
     [MaxLength(100)]
     public string StrikeUsername { get; set; }
+
+    public virtual List<DbWhitelist> Whitelist { get; set; }
 }
