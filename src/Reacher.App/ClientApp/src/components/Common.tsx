@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Center, Link, Text } from "@chakra-ui/react";
 
 export const orangeColor = "#fdaa26";
@@ -24,6 +24,12 @@ export const ReacherFooter = () => (
                 isExternal
             >
                 Support
+            </Link>{"  |  "}
+            <Link
+                href="https://github.com/strikewalker/reacher"
+                isExternal
+            >
+                GitHub
             </Link>
         </Text>
     </Center>
