@@ -15,7 +15,7 @@ import Button from './Button';
 
 const toSetup =
     (<VStack>
-        <Button href="/setup">Log In with Strike</Button>
+        <Button href="/myreacher">Log In with Strike</Button>
         <Text fontSize="sm">to set up your <b>Reacher</b> email</Text>
     </VStack>);
 
