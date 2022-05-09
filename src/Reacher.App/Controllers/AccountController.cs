@@ -22,7 +22,7 @@ public class AccountController : Controller
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        return Redirect("/setup");
+        return Redirect("/myreacher");
     }
 
     [HttpGet]

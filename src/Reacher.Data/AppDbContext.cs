@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<DbReachable> Reachables { get; set; }
     public DbSet<DbEmail> Emails { get; set; }
     public DbSet<DbUser> Users { get; set; }
+    public DbSet<DbWhitelist> Whitelist { get; set; }
 
     public DbSet<EnumTable<EmailType>> EmailTypes { get; set; }
     public DbSet<EnumTable<InvoiceStatus>> InvoiceStatuses { get; set; }

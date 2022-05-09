@@ -11,9 +11,10 @@ public class InvoiceService : IInvoiceService
     private readonly IEmailContentRenderer _emailContentRenderer;
     private readonly IEmailContentService _emailContentService;
     private readonly ISendGridParser _sendGridParser;
+    private readonly IEmailForwardingService _emailForwardingService;
 
     public InvoiceService(IStrikeFacade strikeFacade, ISendGridFacade sendGridFacade, AppDbContext db, IEmailContentRenderer emailContentRenderer,
-        IEmailContentService emailContentService, ISendGridParser sendGridParser)
+        IEmailContentService emailContentService, ISendGridParser sendGridParser, IEmailForwardingService emailForwardingService)
     {
         _strikeFacade = strikeFacade;
         _sendGridFacade = sendGridFacade;
@@ -21,6 +22,7 @@ public class InvoiceService : IInvoiceService
         _emailContentRenderer = emailContentRenderer;
         _emailContentService = emailContentService;
         _sendGridParser = sendGridParser;
+        _emailForwardingService = emailForwardingService;
     }
 
     public async Task<Invoice> GetInvoice(Guid emailId)
@@ -63,94 +65,8 @@ public class InvoiceService : IInvoiceService
             inboundEmail.InvoiceStatus = InvoiceStatus.Paid;
             inboundEmail.PaidDate = DateTime.UtcNow;
             await _db.SaveChangesAsync();
-            var originalEmailStream = await _emailContentService.GetInboundEmail(inboundEmail.Id);
-            var parsed = await _sendGridParser.ParseSendGridInboundEmail(originalEmailStream);
-            await HandleForwardedEmail(inboundEmail, parsed);
-            await HandlePaymentSuccessEmail(inboundEmail, parsed);
+            await _emailForwardingService.ForwardEmail(inboundEmail, true);
         }
-    }
-
-    private async Task HandlePaymentSuccessEmail(DbEmail inboundEmail, InboundEmail parsedEmail)
-    {
-        var reachable = inboundEmail.Reachable;
-
-        var newSubject = $"Your message to {reachable.Name} was delivered successfully";
-
-        var newValues = new
-        {
-            Subject = newSubject,
-            ToEmailAddress = inboundEmail.FromEmailAddress,
-            ToEmailName = inboundEmail.FromEmailName,
-            FromEmailAddress = "noreply@reacher.me",
-            FromEmailName = "Reacher",
-            Body = await _emailContentRenderer.GetPaymentSuccessEmailBody(reachable.ReacherEmailAddress, reachable.Name, inboundEmail.Subject ?? "(no subject)", inboundEmail.CostUsd ?? 0, parsedEmail.Html, parsedEmail.Attachments?.Length ?? 0)
-        };
-
-        var paySuccessEmailId = Guid.NewGuid();
-        var paySuccessEmail = new DbEmail()
-        {
-            Id = paySuccessEmailId,
-            Type = EmailType.PaymentSuccess,
-            Reachable = reachable,
-            OriginalEmailId = inboundEmail.Id,
-            ToEmailAddress = newValues.ToEmailAddress,
-            ToEmailName = newValues.ToEmailName,
-            FromEmailAddress = newValues.FromEmailAddress,
-            FromEmailName = newValues.FromEmailName,
-            Subject = newValues.Subject,
-        };
-        _db.Emails.Add(paySuccessEmail);
-        await _db.SaveChangesAsync();
-
-        await _emailContentService.SaveOutboundEmail(paySuccessEmailId, newValues.Body);
-
-        await _sendGridFacade.SendEmail(newValues.ToEmailAddress, newValues.ToEmailName, newValues.FromEmailAddress, newValues.FromEmailName, newValues.Subject, newValues.Body);
-        paySuccessEmail.SentDate = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
-    }
-    private async Task HandleForwardedEmail(DbEmail inboundEmail, InboundEmail parsedEmail)
-    {
-        var reachable = inboundEmail.Reachable;
-
-        var newSubject = $"New Reacher Email";
-        newSubject = ($"{newSubject}: {inboundEmail.Subject}").Truncate(Constants.MaxSubjectLength);
-
-        var splitEmail = reachable.ReacherEmailAddress.Split('@');
-
-        var reacherEmailAddress = $"{splitEmail[0]}+{inboundEmail.Id}@{splitEmail[1]}";
-
-        var newValues = new
-        {
-            Subject = newSubject,
-            ToEmailAddress = reachable.ToEmailAddress,
-            ToEmailName = reachable.Name,
-            FromEmailAddress = reachable.ReacherEmailAddress,
-            FromEmailName = "Reacher",
-            ReplyToEmailAddress = reacherEmailAddress,
-            Body = await _emailContentRenderer.GetFowardEmail(parsedEmail.Html, inboundEmail.FromEmailAddress, inboundEmail.FromEmailName, inboundEmail.Subject, inboundEmail.CostUsd ?? 0, inboundEmail.Reachable!.ReacherEmailAddress)
-        };
-
-        var forwardedEmailId = Guid.NewGuid();
-        var forwardedEmail = new DbEmail()
-        {
-            Id = forwardedEmailId,
-            Type = EmailType.InboundForward,
-            Reachable = reachable,
-            OriginalEmailId = inboundEmail.Id,
-            ToEmailAddress = newValues.ToEmailAddress,
-            ToEmailName = newValues.ToEmailName,
-            FromEmailAddress = newValues.FromEmailAddress,
-            FromEmailName = newValues.FromEmailName,
-            Subject = newValues.Subject,
-        };
-        _db.Emails.Add(forwardedEmail);
-        await _db.SaveChangesAsync();
-
-        await _emailContentService.SaveOutboundEmail(forwardedEmailId, newValues.Body);
-
-        await _sendGridFacade.SendEmail(newValues.ToEmailAddress, newValues.ToEmailName, newValues.FromEmailAddress, newValues.FromEmailName, newValues.Subject, newValues.Body, newValues.ReplyToEmailAddress, parsedEmail.GetAttachments());
-        forwardedEmail.SentDate = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
     }
 
     public async Task<bool> InvoiceIsPaid(Guid strikeInvoiceId)

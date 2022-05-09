@@ -8,9 +8,10 @@ public class EmailIngestionService : IEmailIngestionService
     private readonly IStrikeFacade _strikeFacade;
     private readonly ISendGridFacade _sendGridFacade;
     private readonly IEmailContentService _emailContentService;
+    private readonly IEmailForwardingService _emailForwardingService;
 
     public EmailIngestionService(AppDbContext db, IEmailContentRenderer emailContentRenderer, ISendGridParser sendGridParser,
-        IStrikeFacade strikeFacade, ISendGridFacade sendGridFacade, IEmailContentService emailContentService)
+        IStrikeFacade strikeFacade, ISendGridFacade sendGridFacade, IEmailContentService emailContentService, IEmailForwardingService emailForwardingService)
     {
         _db = db;
         _emailContentRenderer = emailContentRenderer;
@@ -18,6 +19,7 @@ public class EmailIngestionService : IEmailIngestionService
         _strikeFacade = strikeFacade;
         _sendGridFacade = sendGridFacade;
         _emailContentService = emailContentService;
+        _emailForwardingService = emailForwardingService;
     }
 
     public async Task IngestEmail(Stream emailMessage)
@@ -118,6 +120,7 @@ public class EmailIngestionService : IEmailIngestionService
             {
                 incomingEmail.Type = EmailType.TooBig;
                 await _db.SaveChangesAsync();
+                return;
             }
             else
             {
@@ -129,7 +132,16 @@ public class EmailIngestionService : IEmailIngestionService
                 }
                 else
                 {
+                    var whitelist = await _db.Whitelist.Where(e => e.UserId == reachable.UserId).Select(e => e.EmailAddress.ToUpper()).ToListAsync();
+                    var isInWhitelist = whitelist.Any(w => incomingEmail.FromEmailAddress.ToUpper().EndsWith(w.ToUpper()));
+                    if (isInWhitelist)
+                    {
+                        await _emailForwardingService.ForwardEmail(incomingEmail.Id);
+                        return;
+                    }
+
                     incomingEmail.Type = EmailType.InboundReach;
+                    incomingEmail.InvoiceStatus = InvoiceStatus.Requested;
                     incomingEmail.CostUsd = reachable.CostUsdToReach;
                     await _db.SaveChangesAsync();
                     incomingEmail.StrikeInvoiceId = await _strikeFacade.CreateInvoice(reachable.StrikeUsername, reachable.CostUsdToReach, reachable.Currency, $"Email from {incomingEmail.FromEmailAddress}", incomingEmail.Id);

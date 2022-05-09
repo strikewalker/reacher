@@ -12,4 +12,5 @@ public enum EmailType
     PaymentSuccess = 8,
     Disabled = 9,
     TooBig = 10,
+    Whitelisted = 11
 }

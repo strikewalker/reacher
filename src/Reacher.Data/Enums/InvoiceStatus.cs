@@ -2,5 +2,6 @@
 public enum InvoiceStatus
 {
     Requested,
-    Paid
+    Paid,
+    Forwarded
 }

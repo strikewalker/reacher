@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Route } from 'react-router';
-import { Layout } from './components/Layout';
 import Home from './components/Home';
 import Invoice from './components/Invoice';
-import Setup from './components/Setup';
+import MyReacher from './components/MyReacher';
 import { ConfigProvider } from 'react-avatar';
 import {
     ChakraProvider,
@@ -46,7 +45,7 @@ export default class App extends React.Component {
                 <ChakraProvider theme={theme}>
                     <Route exact path='/' component={Home} />
                     <Route path='/tip/:id' component={Invoice} />
-                    <Route path='/setup' component={Setup} />
+                    <Route path='/myreacher' component={MyReacher} />
                 </ChakraProvider>
             </ConfigProvider>
         );

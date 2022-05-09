@@ -4,7 +4,7 @@ namespace Reacher.Common.Logic;
 
 public interface IEmailContentRenderer
 {
-    Task<string> GetFowardEmail(string body, string fromEmail, string? fromName, string subject, decimal amount, string reacherEmail);
+    Task<string> GetFowardEmail(string body, string fromEmail, string? fromName, string subject, decimal amount, string reacherEmail, bool paid);
     Task<string> GetPayEmailBody(string reacherEmail, string reacherName, Guid emailId, string subject, decimal cost, string html, int attachmentCount);
     Task<string> GetPaymentSuccessEmailBody(string reacherEmail, string reacherName, string subject, decimal cost, string html, int attachmentCount);
 }
@@ -69,14 +69,16 @@ Also note that a direct response to this email will be *ignored*."
         };
         return _templateService.GetTemplateHtmlAsStringAsync("Main", new RazorReacherEmail(email));// _contentProvider.RunTemplate(email);
     }
-    public Task<string> GetFowardEmail(string body, string fromEmail, string? fromName, string subject, decimal amount, string reacherEmail)
+    public Task<string> GetFowardEmail(string body, string fromEmail, string? fromName, string subject, decimal amount, string reacherEmail, bool paid)
     {
         var from = $@"{ fromName ?? fromEmail }{ (fromName != null ? $" ({fromEmail})" : "") }";
+
+        var additional = paid ? $@"You got tipped **{amount:C}** to receive the email below." : "You received this email because the sender is on **your whitelist**.";
         var email = new ReacherEmail
         {
             Summary = $"You have a new Reacher email from {from}",
             MarkdownContentItems = new[] {
-                $@"You got tipped **{amount:C}** to receive the email below.
+                $@"{additional}
 
 You may reply directly to this email, and your response will be forwarded to the sender."
             },
