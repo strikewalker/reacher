@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<ITemplateService, TemplateService>();
         services.AddScoped<IEmailContentRenderer, EmailContentRenderer>();
         services.AddScoped<IEmailIngestionService, EmailIngestionService>();
+        services.AddScoped<IEmailForwardingService, EmailForwardingService>();
         services.AddSingleton<ISendGridFacade, SendGridFacade>();
         services.AddSingleton<IStrikeFacade, StrikeFacade>();
         services.AddSingleton<ISendGridParser, SendGridParser>();
