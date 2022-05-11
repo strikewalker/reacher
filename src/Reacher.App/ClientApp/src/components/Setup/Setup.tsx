@@ -70,11 +70,9 @@ const Setup: React.FC<{ setupConfig: SetupConfig, onComplete: (saved?: boolean) 
                 See your Reacher profile below. Hit 'Update Profile' to change any of the values below.
             </Text>)}
             <form onSubmit={handleSubmit}>
-                <VStack
-                    spacing={4}
-                >
+                <VStack spacing={4}>
                     <FormControl>
-                        <FormLabel>Reacher Email</FormLabel>
+                        <FormLabel>Reacher Email:</FormLabel>
                         {edit ? <InputGroup>
                             <Input
                                 placeholder="yourname"
@@ -94,7 +92,7 @@ const Setup: React.FC<{ setupConfig: SetupConfig, onComplete: (saved?: boolean) 
                         }
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Display Name</FormLabel>
+                        <FormLabel>Display Name:</FormLabel>
                         {edit ? <Input
                             placeholder="Satoshi Nakamoto"
                             value={setupConfig!.name}
@@ -105,7 +103,7 @@ const Setup: React.FC<{ setupConfig: SetupConfig, onComplete: (saved?: boolean) 
                         <FormHelperText>This is the name people will see when referring to you in emails we send.</FormHelperText>
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Strike Username</FormLabel>
+                        <FormLabel>Strike Username:</FormLabel>
                         {edit ? <Input
                             placeholder="satoshi"
                             value={setupConfig!.strikeUsername}
@@ -118,7 +116,7 @@ const Setup: React.FC<{ setupConfig: SetupConfig, onComplete: (saved?: boolean) 
                             (<FormHelperText>This is the the username of the Strike account that will receive the funds.</FormHelperText>)}
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Destination Email</FormLabel>
+                        <FormLabel>Destination Email:</FormLabel>
                         {edit ? <Input
                             type="email"
                             placeholder="user@email.com"
@@ -130,7 +128,7 @@ const Setup: React.FC<{ setupConfig: SetupConfig, onComplete: (saved?: boolean) 
                         <FormHelperText>This is the inbox emails will go to once a tip has been paid.</FormHelperText>
                     </FormControl>
                     <FormControl>
-                        <FormLabel>Tip Amount ({setupConfig.currency})</FormLabel>
+                        <FormLabel>Tip Amount ({setupConfig.currency}):</FormLabel>
                         {edit ? <InputGroup>
                             <InputLeftAddon children={`$`} />
                             <Input

@@ -26,6 +26,16 @@ export async function updateSetupConfig(config?: SetupConfig) {
     })
 }
 
+export async function updateWhitelist(whitelist: string) {
+    await fetch(`/api/user/whitelist`, {
+        method: 'patch',
+        body: JSON.stringify({ emailAddresses: whitelist }),
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+}
+
 export interface UserModel {
     user: LoggedInUser;
     config: SetupConfig;
@@ -40,7 +50,7 @@ export interface RecentSender {
 }
 
 export interface Whitelist {
-    emailAddresses: string[];
+    emailAddresses: string;
 }
 
 export interface SetupConfig {
