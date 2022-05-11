@@ -94,7 +94,7 @@ public class UserController : ControllerBase
         return setupModel;
     }
 
-    [HttpPatch("whitelist")]
+    [HttpPut("whitelist")]
     public async Task UpdateWhitelist([FromBody] Whitelist request)
     {
         var user = await GetLoggedInUser();
@@ -111,10 +111,10 @@ public class UserController : ControllerBase
         if (reachable == null)
             return;
 
-        var recentEmails = await GetReachableRecentEmails(user.UserId);
+        var recentEmails = await GetReachableRecentEmails(reachable.Id);
         foreach (var item in added)
         {
-            var filtered = recentEmails.FindAll(r => r.FromEmailAddress.ToUpper() == item.Upper);
+            var filtered = recentEmails.FindAll(r => r.FromEmailAddress.ToUpper().EndsWith(item.Upper));
             foreach (var recentEmail in filtered)
             {
                 await _emailForwardingService.ForwardEmail(recentEmail.Id);

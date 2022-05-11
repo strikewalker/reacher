@@ -37,6 +37,10 @@ public class EmailForwardingService : IEmailForwardingService
         {
             await HandlePaymentSuccessEmail(inboundEmail, parsed);
         }
+        else {
+            inboundEmail.InvoiceStatus = InvoiceStatus.Forwarded;
+            await _db.SaveChangesAsync();
+        }
     }
 
     private async Task HandlePaymentSuccessEmail(DbEmail inboundEmail, InboundEmail parsedEmail)

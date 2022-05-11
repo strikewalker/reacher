@@ -99,15 +99,19 @@ const MyReacher: React.FC = () => {
 }
 
 const Whitelist: React.FC<{ emails: string, recentSenders: RecentSender[] }> = ({ emails: wl, recentSenders }) => {
+    const [saved, setSaved] = React.useState(false);
     const [isSaving, setSaving] = React.useState(false);
     const [error, setError] = React.useState(false);
     const [whitelist, setWhitelist] = React.useState(wl);
     const handleSubmit = async (event: React.FormEvent<any>) => {
         event.preventDefault();
+        setSaving(true);
+        setError(false);
+        setSaved(false);
         try {
-            setSaving(true);
-            setError(false);
             await updateWhitelist(whitelist);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
         }
         catch (e) {
             console.error(e);
@@ -136,6 +140,9 @@ const Whitelist: React.FC<{ emails: string, recentSenders: RecentSender[] }> = (
                     </FormControl>
                     {error && <Text color="red">
                         An error occurred. Please try again or see console for details.
+                    </Text>}
+                    {saved && <Text color="green" textAlign="center">
+                        Success! Whitelist successfully saved.
                     </Text>}
                     <Button isLoading={isSaving} disabled={isSaving} type="submit" width="100%">Save Whitelist</Button>
                 </VStack>

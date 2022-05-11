@@ -28,7 +28,7 @@ export async function updateSetupConfig(config?: SetupConfig) {
 
 export async function updateWhitelist(whitelist: string) {
     await fetch(`/api/user/whitelist`, {
-        method: 'patch',
+        method: 'put',
         body: JSON.stringify({ emailAddresses: whitelist }),
         headers: {
             'Content-Type': 'application/json'
