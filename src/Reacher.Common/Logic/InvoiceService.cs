@@ -59,7 +59,10 @@ public class InvoiceService : IInvoiceService
             return;
         }
 
-        var inboundEmail = await _db.Emails.Where(e => e.StrikeInvoiceId == strikeInvoiceId).Include(e => e.Reachable).FirstAsync();
+        var inboundEmail = await _db.Emails.Where(e => e.StrikeInvoiceId == strikeInvoiceId).Include(e => e.Reachable).FirstOrDefaultAsync();
+        if (inboundEmail == null) {
+            return;
+        }
         if (inboundEmail.InvoiceStatus != InvoiceStatus.Paid)
         {
             inboundEmail.InvoiceStatus = InvoiceStatus.Paid;
