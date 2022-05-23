@@ -1,4 +1,6 @@
-﻿namespace Reacher.Common.Logic;
+﻿using Microsoft.Extensions.Logging;
+
+namespace Reacher.Common.Logic;
 
 public class EmailIngestionService : IEmailIngestionService
 {
@@ -32,6 +34,10 @@ public class EmailIngestionService : IEmailIngestionService
         var parsedEmail = await _sendGridParser.ParseSendGridInboundEmail(emailStream);
         emailStream.Position = 0;
         var incomingEmail = _sendGridParser.MapInboundEmailToDbEmail(parsedEmail);
+        if (incomingEmail.ToEmailAddress == null)
+        {
+            return;
+        }
         incomingEmail.Id = emailId;
         incomingEmail.ContentLength = emailStream.Length;
         _db.Emails.Add(incomingEmail);
