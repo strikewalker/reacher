@@ -70,9 +70,13 @@ public class UserController : ControllerBase
                 await _db.SaveChangesAsync();
             }
         }
-        var unpaidEmails = await GetReachableRecentEmails(reachable.Id);
-        var recentSenders = unpaidEmails.GroupBy(e => e.FromEmailAddress.ToUpperInvariant()).OrderByDescending(f => f.Count())
-            .Select(g => new RecentSender { EmailAddress = g.First().FromEmailAddress, FromName = g.First().FromEmailName, MessageCount = g.Count() }).ToList();
+        List<RecentSender> recentSenders = new();
+        if (reachable != null)
+        {
+            var unpaidEmails = await GetReachableRecentEmails(reachable.Id);
+            recentSenders = unpaidEmails.GroupBy(e => e.FromEmailAddress.ToUpperInvariant()).OrderByDescending(f => f.Count())
+                .Select(g => new RecentSender { EmailAddress = g.First().FromEmailAddress, FromName = g.First().FromEmailName, MessageCount = g.Count() }).ToList();
+        }
         var whitelist = await GetUserWhitelist(user.UserId);
         var toReplace = _settings.IsTest ? "@testing.reacher.me" : "@reacher.me";
         var setupModel = new UserModel
