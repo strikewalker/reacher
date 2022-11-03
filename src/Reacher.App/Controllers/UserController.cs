@@ -30,15 +30,15 @@ public class UserController : ControllerBase
         _emailForwardingService = emailForwardingService;
     }
 
-    private async Task<(Guid UserId, string Email, string StrikeUsername, string Name)> GetLoggedInUser()
+    private async Task<(Guid UserId, string? Email, string StrikeUsername, string? Name)> GetLoggedInUser()
     {
         var token = await HttpContext.GetTokenAsync("access_token");
         var handler = new JwtSecurityTokenHandler();
         var jwtSecurityToken = handler.ReadJwtToken(token);
         var claims = jwtSecurityToken.Claims;
-        var email = claims.First(c => c.Type == "email").Value;
+        var email = claims.FirstOrDefault(c => c.Type == "email")?.Value;
         var username = claims.First(c => c.Type == "username").Value;
-        var name = claims.First(c => c.Type == "name").Value;
+        var name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
         var id = Guid.Parse(claims.First(c => c.Type == "id").Value);
         return (UserId: id, Email: email, StrikeUsername: username, Name: name);
     }
@@ -184,7 +184,7 @@ public class UserController : ControllerBase
         }
 
         reachable.Name = config.Name;
-        reachable.StrikeUsername = config.StrikeUsername;
+        reachable.StrikeUsername = config.StrikeUsername?.Trim();
         reachable.ReacherEmailAddress = getReacherEmail(config.ReacherEmailPrefix);
         reachable.ToEmailAddress = config.DestinationEmail;
         reachable.CostUsdToReach = config.Price;
